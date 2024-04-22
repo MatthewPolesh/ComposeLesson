@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,18 +15,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.R
@@ -36,8 +40,9 @@ fun Item(
     font_m_regular: FontFamily,
     font_m_light: FontFamily,
     meel: Meel){
-    var clickFlag = remember { mutableStateOf(false) }
-    var item = remember { mutableStateOf(meel) }
+    val clickFlag = remember { mutableStateOf(false) }
+    val item = remember { mutableStateOf(meel) }
+
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -83,12 +88,13 @@ fun Item(
                         .background(color = colorResource(id = R.color.element_background))
                         .clickable {
                             clickFlag.value = !clickFlag.value
-                            item.value.counter++
+                            item.value = item.value.copy(counter = item.value.counter + 1)
+                            meel.counter = item.value.counter
                         }
                 ){
                     if (!clickFlag.value) {
                         Text(
-                            modifier = Modifier.padding(horizontal = 5.dp),
+                            modifier = Modifier.padding(5.dp),
                             text = item.value.price.toString() + "₽",
                             fontSize = 14.sp,
                             fontFamily = font_m_regular,
@@ -97,24 +103,41 @@ fun Item(
                     }
                     else
                     {
-                        Row {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.cross),
                                 contentDescription ="",
                                 tint = colorResource(id = R.color.white),
-                                modifier = Modifier.clickable { item.value.counter-- })
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(18.dp)
+                                    .clickable {
+                                        item.value = item.value.copy(counter = item.value.counter - 1)
+                                        meel.counter = item.value.counter
+                                        if (item.value.counter == 0) clickFlag.value =
+                                            !clickFlag.value
+                                    })
                             Text(
-                                modifier = Modifier.padding(horizontal = 5.dp),
-                                text = "${item.value.counter}",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = 5.dp),
+                                text = item.value.counter.toString(),
                                 fontSize = 14.sp,
                                 fontFamily = font_m_regular,
                                 color = colorResource(id = R.color.white)
                             )
                             Icon(
-                                painter = painterResource(id = R.drawable.check),
+                                painter = painterResource(id = R.drawable.plus),
                                 contentDescription = "",
                                 tint = colorResource(id = R.color.white),
-                                modifier = Modifier.clickable { item.value.counter++ })
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(18.dp)
+                                    .clickable {
+                                        item.value = item.value.copy(counter = item.value.counter + 1)
+                                        meel.counter = item.value.counter
+                                    })
                         }
 
                     }

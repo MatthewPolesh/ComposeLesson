@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,15 +18,21 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -42,19 +50,63 @@ fun ShoppingList(
     font_m_light: FontFamily,
     shoppingList: MutableState<List<Meel>>
 ) {
-    var orderSum = 0
+    var newComment by remember { mutableStateOf("") }
+    val showButton = remember { mutableStateOf(false) }
+    val orderSum = remember { mutableStateOf(shoppingList.value.sumBy { it.price }) }
+    var orderStr = ""
+    if (orderSum.value != 0) {
+        orderStr = "Оплатить ${shoppingList.value.sumBy { it.price }}"
+        showButton.value = !showButton.value
+    } else {
+        showButton.value = false
+    }
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 10.dp)
     ) {
-
-        Text(
-            text = "Заказ",
-            fontSize = 20.sp,
-            color = colorResource(id = R.color.white),
-
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Заказ",
+                fontFamily = font_m_regular,
+                fontSize = 20.sp,
+                color = colorResource(id = R.color.white),
             )
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .clickable { },
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete),
+                        contentDescription = "",
+                        tint = colorResource(id = R.color.white),
+                        modifier = Modifier
+                            .padding(end = 5.dp)
+                            .size(15.dp)
+                    )
+                    Text(
+                        text = "Очистить корзину",
+                        fontFamily = font_m_light,
+                        fontSize = 15.sp,
+                        color = colorResource(id = R.color.white),
+                    )
+                }
+
+            }
+
+        }
+
         Box(
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(20.dp))
@@ -76,7 +128,7 @@ fun ShoppingList(
         Divider(modifier = Modifier.padding(top = 15.dp, bottom = 5.dp))
 
         OutlinedTextField(
-            value = "",
+            value = newComment,
             modifier = Modifier
                 .fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
@@ -88,15 +140,15 @@ fun ShoppingList(
             shape = RoundedCornerShape(15.dp),
             textStyle = TextStyle(
                 color = colorResource(id = R.color.white),
-                //fontFamily = font_m_regular,
+                fontFamily = font_m_regular,
                 fontSize = 15.sp
 
             ),
-            onValueChange = { },
+            onValueChange = { newComment = it },
             label = {
                 Text(
                     text = "Комментарий к заказу",
-                    //fontFamily = font_m_light,
+                    fontFamily = font_m_light,
                     modifier = Modifier.padding(0.dp),
                     fontSize = 10.sp,
                     color = colorResource(id = R.color.white)
@@ -108,6 +160,7 @@ fun ShoppingList(
 
         Text(
             text = "Доставка",
+            fontFamily = font_m_regular,
             fontSize = 20.sp,
             color = colorResource(id = R.color.white),
             modifier = Modifier.padding(bottom = 15.dp)
@@ -126,6 +179,7 @@ fun ShoppingList(
         ) {
             Text(
                 text = "Заказ приготовим",
+                fontFamily = font_m_regular,
                 fontSize = 15.sp,
                 color = colorResource(id = R.color.white)
             )
@@ -134,6 +188,7 @@ fun ShoppingList(
 
             Text(
                 text = "Сегодня до 17.50",
+                fontFamily = font_m_regular,
                 fontSize = 15.sp,
                 color = colorResource(id = R.color.white)
             )
@@ -149,6 +204,7 @@ fun ShoppingList(
             ) {
                 Text(
                     text = "Как можно скорее",
+                    fontFamily = font_m_regular,
                     fontSize = 15.sp,
                     color = colorResource(id = R.color.white),
                     modifier = Modifier.padding(5.dp)
@@ -163,6 +219,7 @@ fun ShoppingList(
             ) {
                 Text(
                     text = "Ко времени",
+                    fontFamily = font_m_regular,
                     fontSize = 15.sp,
                     color = colorResource(id = R.color.white),
                     modifier = Modifier.padding(5.dp)
@@ -178,6 +235,7 @@ fun ShoppingList(
         ) {
             Text(
                 text = "Спопоб оплаты",
+                fontFamily = font_m_regular,
                 fontSize = 15.sp,
                 color = colorResource(id = R.color.white)
             )
@@ -191,35 +249,37 @@ fun ShoppingList(
             ) {
                 Text(
                     text = "Картой онлайн",
+                    fontFamily = font_m_regular,
                     fontSize = 15.sp,
                     color = colorResource(id = R.color.white),
                     modifier = Modifier.padding(5.dp)
                 )
             }
         }
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 15.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = colorResource(id = R.color.yellow)
-            ),
-            onClick = {},
-            content = {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    androidx.compose.material.Text(
-                        text = "Оплатить ${shoppingList.value.forEach { orderSum += it.price }}",
-                        //fontFamily = font_m_regular,
-                        fontSize = 15.sp,
-                        color = colorResource(id = R.color.background)
+        if (showButton.value)
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 15.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = colorResource(id = R.color.yellow)
+                ),
+                onClick = {},
+                content = {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = orderStr,
+                            fontFamily = font_m_regular,
+                            fontSize = 15.sp,
+                            color = colorResource(id = R.color.background)
 
-                    )
+                        )
+                    }
                 }
-            }
-        )
+            )
 
     }
 }

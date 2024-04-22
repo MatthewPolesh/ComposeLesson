@@ -53,7 +53,7 @@ fun ColumnScope.MenuList(
             itemsIndexed(meelMenu) { index, item ->
                 Item(
                     font_m_semibold = font_m_semibold,
-                    font_m_regular =font_m_regular,
+                    font_m_regular = font_m_regular,
                     font_m_light = font_m_light,
                     meel = item
                 )
