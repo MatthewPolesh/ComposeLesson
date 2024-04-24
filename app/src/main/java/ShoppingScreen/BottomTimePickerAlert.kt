@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -15,6 +14,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -31,6 +32,10 @@ fun BottomTimePickerAlert(
     hourState: MutableState<String>,
     minuteState: MutableState<String>,
 ) {
+    val hours = List(20) {listOf("00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23")}.flatMap { it }
+    val minutes = List(20) {listOf("00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60")}.flatMap { it }
+    val selectedHourIndex = remember { mutableStateOf(0) }
+    val selectedMinuteIndex = remember { mutableStateOf(0) }
     ModalBottomSheet(
         containerColor = colorResource(id = R.color.background),
         onDismissRequest = { showPicker.value = !showPicker.value }) {
@@ -50,8 +55,10 @@ fun BottomTimePickerAlert(
                 Spacer(modifier = Modifier.weight(1f))
                 MyTimePicker(
                     font_m_regular = font_m_regular,
-                    HourState = hourState,
-                    MinuteState = minuteState
+                    SelectedHourIndex = selectedHourIndex,
+                    SelectedMinuteIndex = selectedMinuteIndex,
+                    Hours = hours,
+                    Minutes = minutes
                 )
             }
             
@@ -60,7 +67,9 @@ fun BottomTimePickerAlert(
                     .fillMaxWidth()
                     .padding(vertical = 20.dp),
                 shape = RoundedCornerShape(10.dp),
-                onClick = {showPicker.value = !showPicker.value},
+                onClick = {showPicker.value = !showPicker.value
+                    hourState.value = hours[selectedHourIndex.value]
+                    minuteState.value = minutes[selectedMinuteIndex.value]},
                 content = {
                     Box(
                         contentAlignment = Alignment.Center
