@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -52,6 +53,10 @@ fun ShoppingList(
 ) {
     var newComment by remember { mutableStateOf("") }
     val showButton = remember { mutableStateOf(false) }
+    val showPicker = remember { mutableStateOf(false) }
+    val timeFlag = remember { mutableStateOf(true) }
+    val hourState = remember { mutableStateOf("22") }
+    val minuteState = remember { mutableStateOf("12") }
     val orderSum = remember { mutableStateOf(shoppingList.value.sumBy { it.price }) }
     var orderStr = ""
     if (orderSum.value != 0) {
@@ -59,6 +64,40 @@ fun ShoppingList(
         showButton.value = !showButton.value
     } else {
         showButton.value = false
+    }
+    val timeButtonMod1: Modifier
+    val timeButtonMod2: Modifier
+    val timeTextCol1: Color
+    val timeTextCol2: Color
+
+    if (showPicker.value)
+        BottomTimePickerAlert(
+            font_m_regular = font_m_regular,
+            showPicker = showPicker,
+            hourState = hourState,
+            minuteState = minuteState)
+
+    if (timeFlag.value)
+    {
+        timeButtonMod1 = Modifier
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = colorResource(id = R.color.yellow))
+        timeButtonMod2 = Modifier
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = colorResource(id = R.color.element_background))
+        timeTextCol1 = colorResource(id = R.color.element_background)
+        timeTextCol2 = colorResource(id = R.color.white)
+    }
+    else
+    {
+        timeButtonMod1 = Modifier
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = colorResource(id = R.color.element_background))
+        timeButtonMod2 = Modifier
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = colorResource(id = R.color.yellow))
+        timeTextCol1 = colorResource(id = R.color.white)
+        timeTextCol2 = colorResource(id = R.color.element_background)
     }
 
 
@@ -73,7 +112,7 @@ fun ShoppingList(
         ) {
             Text(
                 text = "Заказ",
-                fontFamily = font_m_regular,
+                fontFamily = font_m_semibold,
                 fontSize = 20.sp,
                 color = colorResource(id = R.color.white),
             )
@@ -160,7 +199,7 @@ fun ShoppingList(
 
         Text(
             text = "Доставка",
-            fontFamily = font_m_regular,
+            fontFamily = font_m_semibold,
             fontSize = 20.sp,
             color = colorResource(id = R.color.white),
             modifier = Modifier.padding(bottom = 15.dp)
@@ -179,7 +218,7 @@ fun ShoppingList(
         ) {
             Text(
                 text = "Заказ приготовим",
-                fontFamily = font_m_regular,
+                fontFamily = font_m_light,
                 fontSize = 15.sp,
                 color = colorResource(id = R.color.white)
             )
@@ -187,8 +226,8 @@ fun ShoppingList(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "Сегодня до 17.50",
-                fontFamily = font_m_regular,
+                text = "Сегодня до ${hourState.value}:${minuteState.value}",
+                fontFamily = font_m_light,
                 fontSize = 15.sp,
                 color = colorResource(id = R.color.white)
             )
@@ -197,31 +236,35 @@ fun ShoppingList(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(color = colorResource(id = R.color.element_background))
-                    .clickable { }
+                modifier = timeButtonMod1
+                    .clickable {
+                        timeFlag.value = true
+                        hourState.value = "22"
+                        minuteState.value = "12"
+                    }
             ) {
                 Text(
                     text = "Как можно скорее",
                     fontFamily = font_m_regular,
                     fontSize = 15.sp,
-                    color = colorResource(id = R.color.white),
+                    color = timeTextCol1,
                     modifier = Modifier.padding(5.dp)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
             Box(
-                modifier = Modifier
+                modifier = timeButtonMod2
                     .clip(shape = RoundedCornerShape(20.dp))
-                    .background(color = colorResource(id = R.color.element_background))
-                    .clickable { }
+                    .clickable {
+                        timeFlag.value = false
+                        showPicker.value = !showPicker.value
+                    }
             ) {
                 Text(
                     text = "Ко времени",
                     fontFamily = font_m_regular,
                     fontSize = 15.sp,
-                    color = colorResource(id = R.color.white),
+                    color = timeTextCol2,
                     modifier = Modifier.padding(5.dp)
                 )
             }
