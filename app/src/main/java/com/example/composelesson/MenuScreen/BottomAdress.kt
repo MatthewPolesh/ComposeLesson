@@ -57,7 +57,7 @@ fun BottomAdressAlert(
             modifier = Modifier.padding(horizontal = 10.dp)
         ) {
             Text(
-                text = "Адресс доставки",
+                text = "Адрес доставки",
                 fontFamily = font_m_semibold,
                 fontSize = 20.sp,
                 color = colorResource(id = R.color.white),
@@ -82,7 +82,7 @@ fun BottomAdressAlert(
                 onValueChange = { if (it.length <= 30) newAdress = it },
                 label = {
                     Text(
-                        text = "Адресс",
+                        text = "Адрес",
                         fontFamily = font_m_light,
                         fontSize = 10.sp,
                         color = colorResource(id = R.color.white)
@@ -151,8 +151,8 @@ fun BottomAdressAlert(
                 onClick = {
                     showDialog.value = !showDialog.value
                     adress.value.adress = newAdress
-                    adress.value.house = " , $newHouse"
-                    adress.value.flat = " , $newFlat"
+                    adress.value.house = ", $newHouse"
+                    adress.value.flat = ", $newFlat"
                 },
                 content = {
                     Box(

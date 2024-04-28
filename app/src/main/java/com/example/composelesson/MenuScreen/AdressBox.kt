@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.AccountScreen.BottomAdressAlert
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
 @Composable
@@ -24,6 +25,7 @@ fun AdressBox(
     font_m_light: FontFamily,
     font_m_semibold: FontFamily,
     font_m_regular: FontFamily,
+    viewModel: MainViewModel
     ) {
     val adress = remember { mutableStateOf(Adress("","   ","   ")) }
     val showAdressDialog = remember{ mutableStateOf(false) }

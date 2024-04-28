@@ -47,8 +47,8 @@ fun MyTimePicker(
     Minutes: List<String>
 ) {
 
-    val listHourState = rememberLazyListState(20)
-    val listMinuteState = rememberLazyListState(20)
+    val listHourState = rememberLazyListState(40)
+    val listMinuteState = rememberLazyListState(40)
 
     Box(
         modifier = Modifier

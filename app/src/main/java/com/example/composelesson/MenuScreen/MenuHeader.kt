@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,11 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
-import kotlinx.coroutines.delay
 
 @Composable
-fun MenuHeader(font_caveat: FontFamily, font_montserrat: FontFamily) {
+fun MenuHeader(font_caveat: FontFamily, font_montserrat: FontFamily, viewModel: MainViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

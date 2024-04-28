@@ -6,5 +6,6 @@ enum class FoodType {
     PASTA,
     WOK,
     SALADS,
-    DRINKS
+    DRINKS,
+    TOOLS
 }

@@ -1,25 +1,27 @@
 package com.example.composelesson.MenuScreen
 
-import android.content.ClipData.Item
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,16 +34,20 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
+@SuppressLint("StateFlowValueCalledInComposition")
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Item(
     font_m_semibold: FontFamily,
     font_m_regular: FontFamily,
     font_m_light: FontFamily,
-    meel: Meel){
-    val clickFlag = remember { mutableStateOf(false) }
-    val item = remember { mutableStateOf(meel) }
+    meal: Meel,
+    viewModel: MainViewModel
+) {
+    val item = remember { mutableStateOf(meal) }
 
     Box(
         modifier = Modifier
@@ -65,7 +71,9 @@ fun Item(
                 contentScale = ContentScale.Fit,
             )
             Column(
-                modifier = Modifier.padding(start = 10.dp)
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .height(90.dp)
             ) {
                 Text(
                     modifier = Modifier.padding(bottom = 2.dp),
@@ -75,53 +83,58 @@ fun Item(
                     color = colorResource(id = R.color.white)
                 )
                 Text(
-                    modifier = Modifier.padding(bottom = 25.dp),
                     text = item.value.description,
                     fontFamily = font_m_light,
                     fontSize = 12.sp,
                     color = colorResource(id = R.color.white)
                 )
+                Spacer(modifier = Modifier.weight(1f))
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
                         .clip(shape = RoundedCornerShape(20.dp))
                         .background(color = colorResource(id = R.color.element_background))
                         .clickable {
-                            clickFlag.value = !clickFlag.value
-                            item.value = item.value.copy(counter = item.value.counter + 1)
-                            meel.counter = item.value.counter
+                            if (item.value.counter == 0)
+                                item.value = viewModel.changeShowPrice(meal).copy()
+                            item.value = viewModel.increaseCounter(meal).copy()
+                            //item.value = item.value.copy(counter = item.value.counter + 1)
+                            //meel.counter = item.value.counter
                         }
-                ){
-                    if (!clickFlag.value) {
+                ) {
+                    if (!item.value.showPrice) {
                         Text(
-                            modifier = Modifier.padding(5.dp),
+                            modifier = Modifier.padding(8.dp),
                             text = item.value.price.toString() + "₽",
                             fontSize = 14.sp,
                             fontFamily = font_m_regular,
                             color = colorResource(id = R.color.white)
                         )
-                    }
-                    else
-                    {
+                    } else {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.cross),
-                                contentDescription ="",
+                                contentDescription = "",
                                 tint = colorResource(id = R.color.white),
                                 modifier = Modifier
-                                    .padding(5.dp)
+                                    .padding(start = 8.dp, end = 5.dp, top = 8.dp, bottom = 8.dp)
                                     .size(18.dp)
                                     .clickable {
-                                        item.value = item.value.copy(counter = item.value.counter - 1)
-                                        meel.counter = item.value.counter
-                                        if (item.value.counter == 0) clickFlag.value =
-                                            !clickFlag.value
+                                        item.value = viewModel.decreaseCounter(meal).copy()
+                                        if (item.value.counter == 1) {
+                                            viewModel.deleteItemList(item.value)
+                                            item.value = viewModel.changeShowPrice(meal).copy()
+                                        }
+                                        //item.value = item.value.copy(counter = item.value.counter - 1)
+                                        //meel.counter = item.value.counter
+
+
                                     })
                             Text(
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(vertical = 5.dp),
+                                modifier = Modifier.padding(vertical = 8.dp),
                                 text = item.value.counter.toString(),
                                 fontSize = 14.sp,
                                 fontFamily = font_m_regular,
@@ -132,11 +145,12 @@ fun Item(
                                 contentDescription = "",
                                 tint = colorResource(id = R.color.white),
                                 modifier = Modifier
-                                    .padding(5.dp)
+                                    .padding(start = 5.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
                                     .size(18.dp)
                                     .clickable {
-                                        item.value = item.value.copy(counter = item.value.counter + 1)
-                                        meel.counter = item.value.counter
+                                        item.value = viewModel.increaseCounter(meal).copy()
+                                        //item.value = item.value.copy(counter = item.value.counter + 1)
+                                        //meel.counter = item.value.counter
                                     })
                         }
 

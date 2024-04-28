@@ -1,5 +1,7 @@
 package com.example.composelesson.MenuScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.ColumnScope
@@ -13,22 +15,26 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ColumnScope.MenuList(
     font_m_light: FontFamily,
     font_m_regular: FontFamily,
     font_m_semibold: FontFamily,
     listState: LazyListState,
-    meelMenu: List<Meel>
+    viewModel: MainViewModel
 
 
 ) {
+    val mealMenu = viewModel.mealMenu.collectAsState()
     Surface(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
@@ -50,12 +56,13 @@ fun ColumnScope.MenuList(
                 .background(color = colorResource(id = R.color.background))
                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp)
         ) {
-            itemsIndexed(meelMenu) { index, item ->
+            itemsIndexed(mealMenu.value) { index, item ->
                 Item(
                     font_m_semibold = font_m_semibold,
                     font_m_regular = font_m_regular,
                     font_m_light = font_m_light,
-                    meel = item
+                    meal = item,
+                    viewModel
                 )
             }
         }
