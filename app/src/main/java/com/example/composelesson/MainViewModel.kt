@@ -2,6 +2,9 @@ package com.example.composelesson
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.example.composelesson.AccountScreen.Card
 import com.example.composelesson.MenuScreen.Adress
@@ -9,6 +12,7 @@ import com.example.composelesson.MenuScreen.FoodType
 import com.example.composelesson.MenuScreen.Meel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.time.LocalTime
 
 //Это для логики
@@ -76,8 +80,8 @@ class MainViewModel : ViewModel() {
     private val Meel28 = Meel("Напиток3", "Описание", 999, FoodType.DRINKS)
     private val Meel29 = Meel("Напиток4", "Описание", 999, FoodType.DRINKS)
     private val Meel30 = Meel("Напиток5", "Описание", 999, FoodType.DRINKS)
-    private val tools = Meel("Приборы", "Вилки, салфетки", 0, FoodType.TOOLS, 0)
-    private val _mealMenu: MutableStateFlow<List<Meel>> = MutableStateFlow<List<Meel>>(
+    private val tools = Meel("Приборы", "Вилка, салфетки", 0, FoodType.TOOLS, 0)
+    private var _mealMenu: MutableStateFlow<List<Meel>> = MutableStateFlow<List<Meel>>(
         listOf(
             Meel1, Meel2, Meel3, Meel4,
             Meel5, Meel6, Meel7, Meel8,
@@ -89,45 +93,63 @@ class MainViewModel : ViewModel() {
             Meel29, Meel30
         )
     )
-    val mealMenu = _mealMenu.asStateFlow()
+    var mealMenu = _mealMenu.asStateFlow()
 
 
     //MainMenu--fun
-    fun increaseCounter(item: Meel):Meel{
-        val temp = item
-        if (item.counter == 0)
+
+
+
+
+    fun increaseCounter(name: String){
+        if (name != "Приборы") {
+            val tempMenu = mealMenu.value.toMutableList()
+            val tempShop = shoppingList.value.toMutableList()
+            val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
+            val tempShopIndex = tempShop.indexOfFirst { it.name == name }
+
+
+            if (tempMenu[tempMenuIndex].counter == 0) {
+                tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
+                    counter = tempMenu[tempMenuIndex].counter + 1,
+                    showPrice = true
+                )
+                if (tempShopIndex == -1)
+                    tempShop += tempMenu[tempMenuIndex]
+            } else {
+                tempMenu[tempMenuIndex] =
+                    tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter + 1)
+                tempShop[tempShopIndex] =
+                    tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
+            }
+            _shoppingList.value = tempShop
+            _mealMenu.value = tempMenu
+            countOrderSum()
+        }
+    }
+
+    fun decreaseCounter(name: String){
+        val tempMenu = mealMenu.value.toMutableList()
+        val tempShop = shoppingList.value.toMutableList()
+        val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
+        val tempShopIndex = tempShop.indexOfFirst { it.name == name }
+
+
+        if ( tempMenu[tempMenuIndex].counter == 1)
         {
-            item.counter += 1
-            addItemToList(item)
-            return temp.copy(counter = temp.counter )
+            tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(counter = 0, showPrice = false)
+            tempShop.removeIf { it.name == name }
         }
-        else {
-            item.counter += 1
-            return temp.copy(counter = temp.counter )
-        }
-    }
-
-    fun decreaseCounter(item: Meel):Meel {
-        val temp = item
-        if (item.counter == 1)
+        else
         {
-            item.counter -= 1
-            deleteItemList(item)
-            return temp.copy(counter = temp.counter )
-        } else {
-            item.counter -= 1
-            return temp.copy(counter = temp.counter )
-
+            tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter - 1)
+            tempShop[tempShopIndex] = tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
         }
+        _shoppingList.value = tempShop
+        _mealMenu.value = tempMenu
+        countOrderSum()
     }
 
-
-
-    fun changeShowPrice(item: Meel): Meel {
-        val temp = item
-        item.showPrice = !item.showPrice
-        return temp.copy(showPrice = !temp.showPrice)
-    }
 
     //ShoppingList
     //ShoppingList--flags
@@ -167,28 +189,23 @@ class MainViewModel : ViewModel() {
     val payingType = _payingType.asStateFlow()
 
     private val _shoppingList: MutableStateFlow<List<Meel>> =
-        MutableStateFlow<List<Meel>>(ArrayList<Meel>())
+        MutableStateFlow<List<Meel>>(listOf(tools))
     val shoppingList = _shoppingList.asStateFlow()
 
     //ShoppingList--fun
-    fun countOrderSum(shoppingList: MutableStateFlow<List<Meel>>): Int {
-        if (shoppingList.value.isEmpty()) {
+    fun countOrderSum(){
+        if (_shoppingList.value.size == 1) {
             _showButtonPayment.value = false
-            return 0
+             createOrderSum(0)
         } else {
             _showButtonPayment.value = true
-            return shoppingList.value.sumBy { it.price * it.counter }
+            createOrderSum(_shoppingList.value.sumBy { it.price * it.counter })
         }
     }
 
-    fun addItemToList(item: Meel) {
-        _shoppingList.value += item
-    }
+    fun createOrderSum(sum: Int){
+        _orderStr.value = "Оплатить $sum₽"
 
-    fun deleteItemList(item: Meel) {
-        val temp = ArrayList(_shoppingList.value)
-        temp.removeIf { it.name == item.name }
-        _shoppingList.value = temp
     }
 
     fun clearList() {

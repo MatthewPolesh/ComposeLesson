@@ -1,6 +1,7 @@
 package com.example.composelesson.MenuScreen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -54,7 +56,7 @@ fun ColumnScope.MenuList(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .background(color = colorResource(id = R.color.background))
-                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp, top = 10.dp)
+                .padding(horizontal = 10.dp)
         ) {
             itemsIndexed(mealMenu.value) { index, item ->
                 Item(
@@ -62,7 +64,8 @@ fun ColumnScope.MenuList(
                     font_m_regular = font_m_regular,
                     font_m_light = font_m_light,
                     meal = item,
-                    viewModel
+                    viewModel = viewModel,
+                    index = index
                 )
             }
         }

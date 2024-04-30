@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,14 +12,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Surface
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,7 +31,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,12 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.MainViewModel
 import com.example.composelesson.MenuScreen.Item
-import com.example.composelesson.MenuScreen.Meel
 import com.example.composelesson.R
 
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingList(
@@ -66,9 +69,9 @@ fun ShoppingList(
     val hourState = viewModel.orderHour.collectAsState()
     val payingTypeState = viewModel.payingType.collectAsState()
     val minuteState = viewModel.orderMinute.collectAsState()
-    val orderSum = viewModel.orderSum.collectAsState()
+    val PayBottonFlag = viewModel.showButtonPayment.collectAsState()
     var orderStr = viewModel.orderStr.collectAsState()
-
+    val state = rememberScrollState()
     val timeButtonMod1: Modifier
     val timeButtonMod2: Modifier
     val timeTextCol1: Color
@@ -79,7 +82,8 @@ fun ShoppingList(
             font_m_semibold = font_m_semibold,
             font_m_regular = font_m_regular,
             showAlert = showPayingType,
-            viewModel)
+            viewModel
+        )
 
     if (showPicker.value)
         BottomTimePickerAlert(
@@ -87,10 +91,10 @@ fun ShoppingList(
             font_m_semibold = font_m_semibold,
             showPicker = showPicker,
             timeFlag = timeFlag,
-            viewModel)
+            viewModel
+        )
 
-    if (timeFlag.value)
-    {
+    if (timeFlag.value) {
         timeButtonMod1 = Modifier
             .clip(shape = RoundedCornerShape(20.dp))
             .background(color = colorResource(id = R.color.yellow))
@@ -99,9 +103,7 @@ fun ShoppingList(
             .background(color = colorResource(id = R.color.element_background))
         timeTextCol1 = colorResource(id = R.color.element_background)
         timeTextCol2 = colorResource(id = R.color.white)
-    }
-    else
-    {
+    } else {
         timeButtonMod1 = Modifier
             .clip(shape = RoundedCornerShape(20.dp))
             .background(color = colorResource(id = R.color.element_background))
@@ -118,6 +120,7 @@ fun ShoppingList(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 10.dp)
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -159,183 +162,205 @@ fun ShoppingList(
 
         }
 
-        Box(
+        Surface(
+            shape = RoundedCornerShape(20.dp),
             modifier = Modifier
-                .clip(shape = RoundedCornerShape(20.dp))
+                .fillMaxWidth()
+                .height(345.dp)
+                .padding(top = 15.dp)
+                .border(
+                    width = 0.5.dp,
+                    color = colorResource(id = R.color.white),
+                    shape = RoundedCornerShape(20.dp)
+                )
+
         ) {
             LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = colorResource(id = R.color.background))
+                    .padding(horizontal = 10.dp)
             ) {
-                itemsIndexed(shoppingList.value) { index, item ->
+                itemsIndexed(shoppingList.value.asReversed()) { index, item ->
                     Item(
                         font_m_semibold = font_m_semibold,
                         font_m_regular = font_m_regular,
                         font_m_light = font_m_light,
+                        meal = item,
                         viewModel = viewModel,
-                        meal = item
+                        index = index
                     )
                 }
-
             }
         }
 
         Divider(modifier = Modifier.padding(top = 15.dp, bottom = 5.dp))
 
-        OutlinedTextField(
-            value = newComment,
-            modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = colorResource(id = R.color.white),
-                unfocusedIndicatorColor = colorResource(id = R.color.white),
-                containerColor = colorResource(id = R.color.element_background),
-                cursorColor = colorResource(id = R.color.yellow)
-            ),
-            shape = RoundedCornerShape(15.dp),
-            textStyle = TextStyle(
-                color = colorResource(id = R.color.white),
-                fontFamily = font_m_regular,
-                fontSize = 15.sp
+        Column(
+            modifier = Modifier.verticalScroll(state)
+        ) {
 
-            ),
-            onValueChange = { newComment = it },
-            label = {
+            OutlinedTextField(
+                value = newComment,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = colorResource(id = R.color.white),
+                    unfocusedIndicatorColor = colorResource(id = R.color.white),
+                    containerColor = colorResource(id = R.color.element_background),
+                    cursorColor = colorResource(id = R.color.yellow)
+                ),
+                shape = RoundedCornerShape(15.dp),
+                textStyle = TextStyle(
+                    color = colorResource(id = R.color.white),
+                    fontFamily = font_m_regular,
+                    fontSize = 15.sp
+
+                ),
+                onValueChange = { newComment = it },
+                label = {
+                    Text(
+                        text = "Комментарий к заказу",
+                        fontFamily = font_m_light,
+                        modifier = Modifier.padding(0.dp),
+                        fontSize = 10.sp,
+                        color = colorResource(id = R.color.white)
+                    )
+                },
+            )
+
+            Divider(modifier = Modifier.padding(vertical = 15.dp))
+
+            Text(
+                text = "Доставка",
+                fontFamily = font_m_semibold,
+                fontSize = 20.sp,
+                color = colorResource(id = R.color.white),
+                modifier = Modifier.padding(bottom = 15.dp)
+            )
+
+            DeliveryBox(
+                font_m_light = FontFamily.Default,
+                font_m_semibold = FontFamily.Default,
+                font_m_regular = FontFamily.Default
+            )
+            Divider(modifier = Modifier.padding(vertical = 15.dp))
+
+            Row(
+                modifier = Modifier.padding(bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = "Комментарий к заказу",
+                    text = "Заказ приготовим",
                     fontFamily = font_m_light,
-                    modifier = Modifier.padding(0.dp),
-                    fontSize = 10.sp,
+                    fontSize = 15.sp,
                     color = colorResource(id = R.color.white)
                 )
-            },
-        )
 
-        Divider(modifier = Modifier.padding(vertical = 15.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "Доставка",
-            fontFamily = font_m_semibold,
-            fontSize = 20.sp,
-            color = colorResource(id = R.color.white),
-            modifier = Modifier.padding(bottom = 15.dp)
-        )
-
-        DeliveryBox(
-            font_m_light = FontFamily.Default,
-            font_m_semibold = FontFamily.Default,
-            font_m_regular = FontFamily.Default
-        )
-        Divider(modifier = Modifier.padding(vertical = 15.dp))
-
-        Row(
-            modifier = Modifier.padding(bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Заказ приготовим",
-                fontFamily = font_m_light,
-                fontSize = 15.sp,
-                color = colorResource(id = R.color.white)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "Сегодня до ${hourState.value}:${minuteState.value}",
-                fontFamily = font_m_light,
-                fontSize = 15.sp,
-                color = colorResource(id = R.color.white)
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = timeButtonMod1
-                    .clickable {
-                        timeFlag.value = true
-                        viewModel.changeOrderTime(viewModel.orderHour.value,viewModel.orderMinute.value)
-                    }
-            ) {
                 Text(
-                    text = "Как можно скорее",
-                    fontFamily = font_m_regular,
+                    text = "Сегодня до ${hourState.value}:${minuteState.value}",
+                    fontFamily = font_m_light,
                     fontSize = 15.sp,
-                    color = timeTextCol1,
-                    modifier = Modifier.padding(5.dp)
+                    color = colorResource(id = R.color.white)
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = timeButtonMod2
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .clickable {
-                        timeFlag.value = false
-                        showPicker.value = !showPicker.value
-                    }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Ко времени",
-                    fontFamily = font_m_regular,
-                    fontSize = 15.sp,
-                    color = timeTextCol2,
-                    modifier = Modifier.padding(5.dp)
-                )
-            }
-        }
-
-        Divider(modifier = Modifier.padding(vertical = 15.dp))
-
-        Row(
-            modifier = Modifier.padding(bottom = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Спопоб оплаты",
-                fontFamily = font_m_regular,
-                fontSize = 15.sp,
-                color = colorResource(id = R.color.white)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-
-            Box(
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(20.dp))
-                    .background(color = colorResource(id = R.color.element_background))
-                    .clickable { showPayingType.value = !showPayingType.value }
-            ) {
-                Text(
-                    text = payingTypeState.value,
-                    fontFamily = font_m_regular,
-                    fontSize = 15.sp,
-                    color = colorResource(id = R.color.white),
-                    modifier = Modifier.padding(5.dp)
-                )
-            }
-        }
-        if (viewModel.showButtonPayment.value)
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 15.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = colorResource(id = R.color.yellow)
-                ),
-                onClick = {},
-                content = {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = orderStr.value,
-                            fontFamily = font_m_regular,
-                            fontSize = 15.sp,
-                            color = colorResource(id = R.color.background)
-
-                        )
-                    }
+                Box(
+                    modifier = timeButtonMod1
+                        .clickable {
+                            timeFlag.value = true
+                            viewModel.changeOrderTime(
+                                viewModel.orderHour.value,
+                                viewModel.orderMinute.value
+                            )
+                        }
+                ) {
+                    Text(
+                        text = "Как можно скорее",
+                        fontFamily = font_m_regular,
+                        fontSize = 15.sp,
+                        color = timeTextCol1,
+                        modifier = Modifier.padding(5.dp)
+                    )
                 }
-            )
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = timeButtonMod2
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .clickable {
+                            timeFlag.value = false
+                            showPicker.value = !showPicker.value
+                        }
+                ) {
+                    Text(
+                        text = "Ко времени",
+                        fontFamily = font_m_regular,
+                        fontSize = 15.sp,
+                        color = timeTextCol2,
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
 
+            Divider(modifier = Modifier.padding(vertical = 15.dp))
+
+            Row(
+                modifier = Modifier.padding(bottom = 15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Спопоб оплаты",
+                    fontFamily = font_m_regular,
+                    fontSize = 15.sp,
+                    color = colorResource(id = R.color.white)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+
+                Box(
+                    modifier = Modifier
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .background(color = colorResource(id = R.color.element_background))
+                        .clickable { showPayingType.value = !showPayingType.value }
+                ) {
+                    Text(
+                        text = payingTypeState.value,
+                        fontFamily = font_m_regular,
+                        fontSize = 15.sp,
+                        color = colorResource(id = R.color.white),
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
+            if (PayBottonFlag.value) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 15.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(id = R.color.yellow)
+                    ),
+                    onClick = {},
+                    content = {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = orderStr.value,
+                                fontFamily = font_m_regular,
+                                fontSize = 15.sp,
+                                color = colorResource(id = R.color.background)
+
+                            )
+                        }
+                    }
+                )
+            } else Spacer(modifier = Modifier.weight(1f))
+
+        }
     }
 }
