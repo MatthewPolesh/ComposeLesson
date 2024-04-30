@@ -95,19 +95,22 @@ class MainViewModel : ViewModel() {
     )
     var mealMenu = _mealMenu.asStateFlow()
 
+    private val _selectedAdress: MutableStateFlow<Adress> = MutableStateFlow(Adress("","",""))
+    val selectedAdress = _selectedAdress
+
 
     //MainMenu--fun
 
-
-
-
+    fun changeAdress(adress: String, house: String, flat: String)
+    {
+        _selectedAdress.value = _selectedAdress.value.copy(adress = adress.trim(), house = house.trim(), flat = flat.trim())
+    }
     fun increaseCounter(name: String){
         if (name != "Приборы") {
             val tempMenu = mealMenu.value.toMutableList()
             val tempShop = shoppingList.value.toMutableList()
             val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
             val tempShopIndex = tempShop.indexOfFirst { it.name == name }
-
 
             if (tempMenu[tempMenuIndex].counter == 0) {
                 tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
@@ -179,10 +182,10 @@ class MainViewModel : ViewModel() {
         MutableStateFlow((_currentMinute.value.substring(0, 1) + '5'))
     val orderMinute = _orderMinute.asStateFlow()
 
-    private val _selectedHour: MutableStateFlow<String> = MutableStateFlow("")
+    private val _selectedHour: MutableStateFlow<String> = MutableStateFlow(orderHour.value)
     val selectedHour = _selectedHour
 
-    private val _selectedMinute: MutableStateFlow<String> = MutableStateFlow("")
+    private val _selectedMinute: MutableStateFlow<String> = MutableStateFlow(orderMinute.value)
     val selectedMinute = _selectedMinute
 
     private val _payingType: MutableStateFlow<String> = MutableStateFlow("Картой")
@@ -192,7 +195,15 @@ class MainViewModel : ViewModel() {
         MutableStateFlow<List<Meel>>(listOf(tools))
     val shoppingList = _shoppingList.asStateFlow()
 
+    private val _orderComment: MutableStateFlow<String> = MutableStateFlow("")
+    val orderComment = _orderComment
+
     //ShoppingList--fun
+    fun changeOrderComment(newComment: String)
+    {
+        _orderComment.value = newComment
+    }
+
     fun countOrderSum(){
         if (_shoppingList.value.size == 1) {
             _showButtonPayment.value = false

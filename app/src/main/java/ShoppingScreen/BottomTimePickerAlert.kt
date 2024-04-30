@@ -49,7 +49,7 @@ fun BottomTimePickerAlert(
         onDismissRequest =
         {
             showPicker.value = !showPicker.value
-            viewModel.changeOrderTime(hours[selectedHourIndex.value],minutes[selectedMinuteIndex.value])
+            viewModel.changeOrderTime(viewModel.orderHour.value,viewModel.orderMinute.value)
             timeFlag.value = !timeFlag.value
         }
     ) {

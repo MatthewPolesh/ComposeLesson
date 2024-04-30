@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,8 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,36 +21,41 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.substring
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.R
-import my.app.android.Mask
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomAdressAlert(
     font_m_regular: FontFamily,
     font_m_semibold: FontFamily,
     font_m_light: FontFamily,
-    adress: MutableState<Adress>,
+    adress: State<Adress>,
     showDialog: MutableState<Boolean>,
+    viewModel: MainViewModel,
 ) {
 
     var newAdress by remember { mutableStateOf(adress.value.adress) }
-    var newHouse by remember { mutableStateOf(adress.value.house.substring(3)) }
-    var newFlat by remember { mutableStateOf(adress.value.flat.substring(3)) }
+    var newHouse by remember { mutableStateOf(adress.value.house) }
+    var newFlat by remember { mutableStateOf(adress.value.flat) }
+    val focusManager = LocalFocusManager.current
 
     ModalBottomSheet(
         containerColor = colorResource(id = R.color.element_background),
@@ -72,6 +80,7 @@ fun BottomAdressAlert(
                     containerColor = colorResource(id = R.color.element_background),
                     cursorColor = colorResource(id = R.color.yellow)
                 ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                 shape = RoundedCornerShape(15.dp),
                 textStyle = TextStyle(
                     color = colorResource(id = R.color.white),
@@ -105,6 +114,7 @@ fun BottomAdressAlert(
                         fontFamily = font_m_regular,
                         fontSize = 15.sp
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     onValueChange = { if (it.length <= 5) newHouse = it },
                     label = {
                         Text(
@@ -130,8 +140,11 @@ fun BottomAdressAlert(
                         color = colorResource(id = R.color.white),
                         fontFamily = font_m_regular,
                         fontSize = 15.sp
-
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Sentences),
+                    keyboardActions = KeyboardActions(onDone  = {
+                        showDialog.value = !showDialog.value
+                        viewModel.changeAdress(newAdress,newHouse,newFlat)}, ),
                     onValueChange = { if (it.length <= 5) newFlat = it },
                     label = {
                         Text(
@@ -150,9 +163,7 @@ fun BottomAdressAlert(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
                     showDialog.value = !showDialog.value
-                    adress.value.adress = newAdress
-                    adress.value.house = ", $newHouse"
-                    adress.value.flat = ", $newFlat"
+                    viewModel.changeAdress(newAdress,newHouse,newFlat)
                 },
                 content = {
                     Box(

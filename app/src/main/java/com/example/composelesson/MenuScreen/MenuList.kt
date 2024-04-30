@@ -65,7 +65,7 @@ fun ColumnScope.MenuList(
                     font_m_light = font_m_light,
                     meal = item,
                     viewModel = viewModel,
-                    index = index
+
                 )
             }
         }

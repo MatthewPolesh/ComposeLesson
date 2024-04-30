@@ -1,6 +1,8 @@
 package com.example.composelesson.MenuScreen
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun MenuScreen(viewModel: MainViewModel) {
@@ -35,7 +38,7 @@ fun MenuScreen(viewModel: MainViewModel) {
                 MenuHeader(
                     font_caveat = caveat,
                     font_montserrat = montserrat_regular,
-                    viewModel)
+                    viewModel = viewModel)
 
                 AdressBox(
                     font_m_regular = montserrat_regular,
@@ -48,7 +51,7 @@ fun MenuScreen(viewModel: MainViewModel) {
                     font_m_regular = montserrat_regular,
                     font_m_light = montserrat_light,
                     font_m_semibold = montserrat_semibold,
-                    viewModel)
+                    viewModel = viewModel)
             }
 
 }

@@ -1,6 +1,7 @@
 package ShoppingScreen
 
-import android.graphics.fonts.Font
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -18,16 +20,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.AccountScreen.BottomAdressAlert
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DeliveryBox(
     font_m_light: FontFamily,
     font_m_regular: FontFamily,
-    font_m_semibold: FontFamily
+    font_m_semibold: FontFamily,
+    viewModel: MainViewModel
 ) {
-    val adress = remember { mutableStateOf(Adress("", "   ", "   ")) }
+    val adress = viewModel.selectedAdress.collectAsState()
     val showAdressDialog = remember { mutableStateOf(false) }
 
 
@@ -38,6 +43,7 @@ fun DeliveryBox(
             font_m_light = font_m_light,
             adress = adress,
             showDialog = showAdressDialog,
+            viewModel = viewModel,
         )
 
     Box(
@@ -51,7 +57,7 @@ fun DeliveryBox(
 
     ) {
         Text(
-            text = if (adress.value.adress == "") "Выберите адрес доставки" else "Адрес доставки: " + adress.value.adress + adress.value.house + adress.value.flat,
+            text = if (adress.value.adress == "") "Выберите адрес доставки" else "${adress.value.adress}, д. ${adress.value.house}, кв. ${adress.value.flat}",
             fontFamily = font_m_light,
             maxLines = 1,
             fontSize = 14.sp,

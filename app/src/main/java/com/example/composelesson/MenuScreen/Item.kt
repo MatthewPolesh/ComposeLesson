@@ -46,7 +46,6 @@ fun Item(
     font_m_light: FontFamily,
     meal: Meel,
     viewModel: MainViewModel,
-    index: Int
 ) {
 
     Box(
