@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,10 +26,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 import my.app.android.Mask
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountRegistration(
@@ -35,18 +39,21 @@ fun AccountRegistration(
     font_m_light: FontFamily,
     font_m_semibold: FontFamily,
     showAlert: MutableState<Boolean>,
-    registrationFlag: MutableState<Boolean>,
-    user: MutableState<User>,
-    phoneMask: Mask
+    phoneMask: Mask,
+    viewModel: MainViewModel
 ) {
-    var newName by remember { mutableStateOf("")}
-    var newPhoneNumber by remember { mutableStateOf("")}
+    var newName by remember { mutableStateOf("") }
+    var newPhoneNumber by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
-        title = { Text(
-            text = "Регистрация",
-            color = colorResource(id = R.color.white),
-            fontFamily = font_m_semibold) },
+        title = {
+            Text(
+                text = "Регистрация",
+                color = colorResource(id = R.color.white),
+                fontFamily = font_m_semibold
+            )
+        },
         text = {
             Column() {
                 OutlinedTextField(
@@ -55,7 +62,8 @@ fun AccountRegistration(
                         focusedIndicatorColor = colorResource(id = R.color.white),
                         unfocusedIndicatorColor = colorResource(id = R.color.white),
                         containerColor = colorResource(id = R.color.element_background),
-                        cursorColor = colorResource(id = R.color.yellow)),
+                        cursorColor = colorResource(id = R.color.yellow)
+                    ),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
@@ -90,41 +98,72 @@ fun AccountRegistration(
                     ),
                     visualTransformation = phoneMask,
                     onValueChange = { if (it.length <= 10) newPhoneNumber = it },
-                    label = { Text(
-                        text = "Номер телефона",
-                        fontFamily = font_m_light,
-                        fontSize = 10.sp,
-                        color = colorResource(id = R.color.white))},
-
+                    label = {
+                        Text(
+                            text = "Номер телефона",
+                            fontFamily = font_m_light,
+                            fontSize = 10.sp,
+                            color = colorResource(id = R.color.white)
+                        )
+                    },
                     )
+                OutlinedTextField(
+                    value = newPassword,
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = colorResource(id = R.color.white),
+                        unfocusedIndicatorColor = colorResource(id = R.color.white),
+                        containerColor = colorResource(id = R.color.element_background),
+                        cursorColor = colorResource(id = R.color.yellow)
+                    ),
+                    shape = RoundedCornerShape(15.dp),
+                    textStyle = TextStyle(
+                        color = colorResource(id = R.color.white),
+                        fontFamily = font_m_regular,
+                        fontSize = 15.sp
+                    ),
+                    onValueChange = { if (it.length <= 20) newPassword = it },
+                    label = {
+                        Text(
+                            text = "Пароль",
+                            fontFamily = font_m_light,
+                            fontSize = 10.sp,
+                            color = colorResource(id = R.color.white)
+                        )
+                    },
+                )
             }
         },
-        confirmButton =  { Button(
-            content = { Icon(
-                painter = painterResource(id = R.drawable.check),
-                contentDescription = "",
-                tint = colorResource(id = R.color.element_background),
-                modifier = Modifier.size(18.dp)
-            )},
-            onClick = { showAlert.value = !showAlert.value
-                registrationFlag.value = !registrationFlag.value
-                user.value.name = newName
-                user.value.phoneNumber = newPhoneNumber
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
-        )},
-        onDismissRequest = { showAlert.value = !showAlert.value  },
-        dismissButton = { Button(
-            content = { Icon(
-                painter = painterResource(id = R.drawable.cross),
-                contentDescription = "",
-                tint = colorResource(id = R.color.element_background),
-                modifier = Modifier.size(20.dp)
+        confirmButton = {
+            Button(
+                content = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.check),
+                        contentDescription = "",
+                        tint = colorResource(id = R.color.element_background),
+                        modifier = Modifier.size(18.dp)
+                    )
+                },
+                onClick = {
+                    showAlert.value = !showAlert.value
+                    viewModel.registerUser(newName, newPhoneNumber, newPassword)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow)),
-            onClick = { showAlert.value = !showAlert.value }
-        )
+        },
+        onDismissRequest = { showAlert.value = !showAlert.value },
+        dismissButton = {
+            Button(
+                content = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.cross),
+                        contentDescription = "",
+                        tint = colorResource(id = R.color.element_background),
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow)),
+                onClick = { showAlert.value = !showAlert.value }
+            )
 
         })
 }

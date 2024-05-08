@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,25 +30,26 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 import my.app.android.Mask
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomCardAlert(
     font_m_regular: FontFamily,
     font_m_semibold: FontFamily,
     font_m_light: FontFamily,
-    card: MutableState<Card>,
     showDialog: MutableState<Boolean>,
-    cards: MutableState<List<Card>>,
     cardMask: Mask,
-    dataMask: Mask
+    dataMask: Mask,
+    viewModel: MainViewModel
 ) {
 
-    var newName by remember { mutableStateOf(card.value.number) }
-    var newCVC by remember { mutableStateOf(card.value.cvc) }
-    var newDate by remember { mutableStateOf(card.value.data) }
+    var newName by remember { mutableStateOf("") }
+    var newCVC by remember { mutableStateOf("") }
+    var newDate by remember { mutableStateOf("") }
 
     ModalBottomSheet(
         containerColor = colorResource(id = R.color.element_background),
@@ -152,7 +155,7 @@ fun BottomCardAlert(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
                     showDialog.value = !showDialog.value
-                    cards.value = cards.value.toMutableList().apply {add(Card(number = newName, cvc = newCVC, data = newDate))}
+                    viewModel.addCard(Card(number = newName, cvc = newCVC, data = newDate))
                           },
                 content = {
                     Box(

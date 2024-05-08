@@ -1,6 +1,8 @@
 package com.example.composelesson.AccountScreen
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,19 +13,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RememberReturnType")
-@Preview(showBackground = true)
 @Composable
 fun AccountScreen(viewModel: MainViewModel) {
     val caveat = FontFamily(Font(R.font.caveat, FontWeight.Normal))
     val montserrat_regular = FontFamily(Font(R.font.montserratalternatesregular, FontWeight.Normal))
     val montserrat_light = FontFamily(Font(R.font.montserratalternateslight, FontWeight.Normal))
-    val montserrat_semibold = FontFamily(Font(R.font.montserratalternatessemibold, FontWeight.Normal))
+    val montserrat_semibold =
+        FontFamily(Font(R.font.montserratalternatessemibold, FontWeight.Normal))
 
 
 
@@ -34,11 +36,14 @@ fun AccountScreen(viewModel: MainViewModel) {
             .padding(horizontal = 10.dp)
     ) {
         AccountHeader(
-            font_caveat = caveat)
+            font_caveat = caveat
+        )
         AccountMenu(
             font_m_semibold = montserrat_semibold,
             font_m_regular = montserrat_regular,
-            font_m_light = montserrat_light)
+            font_m_light = montserrat_light,
+            viewModel = viewModel
+        )
 
     }
 }

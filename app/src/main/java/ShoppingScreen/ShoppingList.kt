@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,7 +66,6 @@ fun ShoppingList(
     var newComment = viewModel.orderComment.collectAsState()
     val showPayingType = remember { mutableStateOf(false) }
     val showPicker = remember { mutableStateOf(false) }
-    val timeFlag = remember { mutableStateOf(true) }
     val state = rememberScrollState()
     val focusManager = LocalFocusManager.current
 
@@ -76,7 +74,8 @@ fun ShoppingList(
     val payingTypeState = viewModel.payingType.collectAsState()
     val shoppingList = viewModel.shoppingList.collectAsState()
     val PayBottonFlag = viewModel.showButtonPayment.collectAsState()
-    var orderStr = viewModel.orderStr.collectAsState()
+    val orderStr = viewModel.orderStr.collectAsState()
+    val timeFlag = viewModel.orderTimeFlag.collectAsState()
 
     val timeButtonMod1: Modifier
     val timeButtonMod2: Modifier
@@ -88,7 +87,7 @@ fun ShoppingList(
             font_m_semibold = font_m_semibold,
             font_m_regular = font_m_regular,
             showAlert = showPayingType,
-            viewModel
+            viewModel = viewModel
         )
 
     if (showPicker.value)
@@ -96,8 +95,7 @@ fun ShoppingList(
             font_m_regular = font_m_regular,
             font_m_semibold = font_m_semibold,
             showPicker = showPicker,
-            timeFlag = timeFlag,
-            viewModel
+            viewModel = viewModel
         )
 
     if (timeFlag.value) {
@@ -278,7 +276,7 @@ fun ShoppingList(
             Box(
                 modifier = timeButtonMod1
                     .clickable {
-                        timeFlag.value = true
+                        viewModel.changeOrderTimeFlag()
                         viewModel.changeOrderTime(
                             viewModel.orderHour.value,
                             viewModel.orderMinute.value
@@ -298,7 +296,7 @@ fun ShoppingList(
                 modifier = timeButtonMod2
                     .clip(shape = RoundedCornerShape(20.dp))
                     .clickable {
-                        timeFlag.value = false
+                        viewModel.changeOrderTimeFlag()
                         showPicker.value = !showPicker.value
                     }
             ) {

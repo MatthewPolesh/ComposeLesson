@@ -25,6 +25,9 @@ class MainViewModel : ViewModel() {
     private val _registrationFlag: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val registrationFlag = _registrationFlag.asStateFlow()
 
+    private val _entranceFlag: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val entranceFlag = _entranceFlag
+
     //AccountMenu--info
     private val _userName: MutableStateFlow<String> = MutableStateFlow("")
     val userName = _userName.asStateFlow()
@@ -38,6 +41,42 @@ class MainViewModel : ViewModel() {
     private val _cards: MutableStateFlow<List<Card>> = MutableStateFlow<List<Card>>(emptyList())
     val cards = _cards.asStateFlow()
     //AccountMenu--fun
+
+    fun deleteCard(card: Card)
+    {
+        val tempArr = cards.value.toMutableList()
+        tempArr.removeIf { it.number == card.number }
+        _cards.value = tempArr
+    }
+
+    fun addCard(card: Card){
+        _cards.value += card
+
+    }
+    fun changeUserInfo(userName: String,userPhone: String){
+        _userName.value = userName
+        _userPhone.value = userPhone
+    }
+    fun entryUser(userPhone: String, userPassword: String)
+    {
+        _userPhone.value = userPhone
+        _userPassword.value = userPassword
+        _entranceFlag.value = !_entranceFlag.value
+    }
+    fun registerUser(userName: String, userPhone: String, userPassword: String)
+    {
+        _userName.value = userName
+        _userPhone.value = userPhone
+        _userPassword.value = userPassword
+        _registrationFlag.value = !_registrationFlag.value
+    }
+    fun Exit()
+    {
+        _userName.value = ""
+        _userPhone.value = ""
+        _entranceFlag.value = !_entranceFlag.value
+        _registrationFlag.value = !_registrationFlag.value
+    }
 
     //MainMenu
     //MainMenu--flags
@@ -159,6 +198,9 @@ class MainViewModel : ViewModel() {
     private val _showButtonPayment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showButtonPayment = _showButtonPayment.asStateFlow()
 
+    private  val _orderTimeFlag: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val orderTimeFlag = _orderTimeFlag.asStateFlow()
+
     //ShoppingList--info
     private val _orderStr: MutableStateFlow<String> = MutableStateFlow("")
     val orderStr = _orderStr.asStateFlow()
@@ -198,7 +240,12 @@ class MainViewModel : ViewModel() {
     private val _orderComment: MutableStateFlow<String> = MutableStateFlow("")
     val orderComment = _orderComment
 
+
+
     //ShoppingList--fun
+    fun changeOrderTimeFlag(){
+        _orderTimeFlag.value = !_orderTimeFlag.value
+    }
     fun changeOrderComment(newComment: String)
     {
         _orderComment.value = newComment

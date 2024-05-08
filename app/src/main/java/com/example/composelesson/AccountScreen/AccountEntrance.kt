@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,10 +26,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 import my.app.android.Mask
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountEntrance(
@@ -35,11 +39,11 @@ fun AccountEntrance(
     font_m_light: FontFamily,
     font_m_semibold: FontFamily,
     showAlert: MutableState<Boolean>,
-    entranceFlag: MutableState<Boolean>,
-    user: MutableState<User>,
-    phoneMask: Mask) {
-    var newName by remember { mutableStateOf("")}
-    var newPhoneNumber by remember { mutableStateOf("")}
+    phoneMask: Mask,
+    viewModel: MainViewModel
+) {
+    var newPhone by remember { mutableStateOf("")}
+    var newPassword by remember { mutableStateOf("")}
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
         title = { Text(
@@ -49,7 +53,7 @@ fun AccountEntrance(
         text = {
             Column() {
                 OutlinedTextField(
-                    value = newName,
+                    value = newPhone,
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = colorResource(id = R.color.white),
                         unfocusedIndicatorColor = colorResource(id = R.color.white),
@@ -62,10 +66,11 @@ fun AccountEntrance(
                         fontSize = 15.sp
 
                     ),
-                    onValueChange = { if (it.length <= 23) newName = it },
+                    visualTransformation = phoneMask,
+                    onValueChange = { if (it.length <= 10) newPhone = it },
                     label = {
                         Text(
-                            text = "Имя",
+                            text = "Номер телефона",
                             fontFamily = font_m_light,
                             fontSize = 10.sp,
                             color = colorResource(id = R.color.white)
@@ -74,7 +79,7 @@ fun AccountEntrance(
 
                     )
                 OutlinedTextField(
-                    value = newPhoneNumber,
+                    value = newPassword,
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = colorResource(id = R.color.white),
                         unfocusedIndicatorColor = colorResource(id = R.color.white),
@@ -87,10 +92,9 @@ fun AccountEntrance(
                         fontFamily = font_m_regular,
                         fontSize = 15.sp
                     ),
-                    visualTransformation = phoneMask,
-                    onValueChange = { if (it.length <= 10) newPhoneNumber = it },
+                    onValueChange = { if (it.length <= 20) newPassword = it },
                     label = { Text(
-                        text = "Номер телефона",
+                        text = "Пароль",
                         fontFamily = font_m_light,
                         fontSize = 10.sp,
                         color = colorResource(id = R.color.white))},
@@ -106,9 +110,7 @@ fun AccountEntrance(
                 modifier = Modifier.size(18.dp)
             )},
             onClick = { showAlert.value = !showAlert.value
-                entranceFlag.value = !entranceFlag.value
-                user.value.name = newName
-                user.value.phoneNumber = newPhoneNumber
+                viewModel.entryUser(newPhone, newPassword)
             },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
         )},

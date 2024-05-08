@@ -1,5 +1,8 @@
 package com.example.composelesson.AccountScreen
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +19,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,22 +30,28 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 import my.app.android.Mask
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AccountMenu(
     font_m_semibold: FontFamily,
     font_m_regular: FontFamily,
-    font_m_light: FontFamily
+    font_m_light: FontFamily,
+    viewModel: MainViewModel
 ) {
+    val registrationFlag = viewModel.registrationFlag.collectAsState()
+    val entranceFlag = viewModel.entranceFlag.collectAsState()
+
     val showAlertAccount = remember { mutableStateOf(false)}
     val showAlertEntrance = remember { mutableStateOf(false)}
-    val registrationFlag = remember { mutableStateOf(false)}
     val showAlertRegistration = remember { mutableStateOf(false) }
     val showDialogCard = remember { mutableStateOf(false) }
-    val user = remember { mutableStateOf(User("","")) }
+
     val card = remember { mutableStateOf(Card("","","")) }
     val cardsList = remember { mutableStateOf<List<Card>>(emptyList()) }
     val cardMask = Mask("####-####-####-####")
@@ -54,8 +64,8 @@ fun AccountMenu(
             font_m_regular = font_m_regular,
             font_m_light = font_m_light,
             showAlert = showAlertAccount,
-            user = user,
-            phoneMask = phoneMask
+            phoneMask = phoneMask,
+            viewModel = viewModel
             )
     }
     if (showAlertRegistration.value)
@@ -64,9 +74,8 @@ fun AccountMenu(
             font_m_light = font_m_light,
             font_m_semibold = font_m_semibold,
             showAlert = showAlertRegistration,
-            user = user,
-            registrationFlag = registrationFlag,
-            phoneMask = phoneMask
+            phoneMask = phoneMask,
+            viewModel = viewModel
         )
     if (showAlertEntrance.value)
         AccountEntrance(
@@ -74,9 +83,8 @@ fun AccountMenu(
             font_m_light = font_m_light,
             font_m_semibold = font_m_semibold,
             showAlert = showAlertEntrance,
-            entranceFlag = registrationFlag ,
-            user = user,
-            phoneMask = phoneMask
+            phoneMask = phoneMask,
+            viewModel = viewModel
         )
 
     if (showDialogCard.value)
@@ -84,13 +92,12 @@ fun AccountMenu(
             font_m_regular = font_m_regular,
             font_m_semibold = font_m_semibold,
             font_m_light = font_m_light,
-            card = card,
             showDialog = showDialogCard,
-            cards = cardsList,
             cardMask = cardMask,
-            dataMask= dateMask
+            dataMask= dateMask,
+            viewModel = viewModel
         )
-    if( registrationFlag.value) {
+    if( registrationFlag.value or entranceFlag.value) {
         Box(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -113,7 +120,7 @@ fun AccountMenu(
                     Spacer(modifier = Modifier.weight(1F))
                     Button(
                         shape = RoundedCornerShape(20.dp),
-                        onClick = { registrationFlag.value = !registrationFlag.value },
+                        onClick = { viewModel.Exit() },
                         content = {
                             Box(
                                 contentAlignment = Alignment.Center
@@ -147,7 +154,7 @@ fun AccountMenu(
                             tint = colorResource(id = R.color.white)
                         )
                         Text(
-                            text = user.value.name,
+                            text = viewModel.userName.value,
                             fontSize = 15.sp,
                             fontFamily = font_m_regular,
                             color = colorResource(id = R.color.white)
@@ -165,7 +172,7 @@ fun AccountMenu(
                         )
                         BasicTextField(
                             onValueChange = {},
-                            value = user.value.phoneNumber,
+                            value = viewModel.userPhone.value,
                             readOnly = true,
                             textStyle = TextStyle(
                             fontSize = 15.sp,
@@ -200,7 +207,7 @@ fun AccountMenu(
                         backgroundColor = colorResource(id = R.color.yellow)
                     )
                 )
-                CardsColumn(font_m_regular = font_m_regular, cards = cardsList, showDialog = showDialogCard)
+                CardsColumn(font_m_regular = font_m_regular, showDialog = showDialogCard, viewModel = viewModel)
             }
         }
     }

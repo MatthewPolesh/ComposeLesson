@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,10 +26,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 import my.app.android.Mask
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountAlert(
@@ -35,10 +39,11 @@ fun AccountAlert(
     font_m_light: FontFamily,
     font_m_semibold: FontFamily,
     showAlert: MutableState<Boolean>,
-    user: MutableState<User>,
-    phoneMask: Mask) {
-    var newName by remember { mutableStateOf(user.value.name)}
-    var newPhoneNumber by remember { mutableStateOf(user.value.phoneNumber)}
+    phoneMask: Mask,
+    viewModel: MainViewModel
+) {
+    var newName by remember { mutableStateOf(viewModel.userName.value)}
+    var newPhoneNumber by remember { mutableStateOf(viewModel.userPhone.value)}
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
         title = { Text(
@@ -105,8 +110,7 @@ fun AccountAlert(
                 modifier = Modifier.size(18.dp)
             )},
             onClick = { showAlert.value = !showAlert.value
-                        user.value.name = newName
-                        user.value.phoneNumber = newPhoneNumber
+                        viewModel.changeUserInfo(newName,newPhoneNumber)
                       },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )},

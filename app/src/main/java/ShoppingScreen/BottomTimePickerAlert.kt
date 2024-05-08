@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,7 +37,6 @@ fun BottomTimePickerAlert(
     font_m_regular: FontFamily,
     font_m_semibold: FontFamily,
     showPicker: MutableState<Boolean>,
-    timeFlag: MutableState<Boolean>,
     viewModel: MainViewModel
 ) {
     val hours = List(200) {listOf("00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23")}.flatMap { it }
@@ -50,7 +50,7 @@ fun BottomTimePickerAlert(
         {
             showPicker.value = !showPicker.value
             viewModel.changeOrderTime(viewModel.orderHour.value,viewModel.orderMinute.value)
-            timeFlag.value = !timeFlag.value
+            viewModel.changeOrderTimeFlag()
         }
     ) {
         Column(

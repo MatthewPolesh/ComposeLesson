@@ -1,5 +1,7 @@
 package com.example.composelesson.AccountScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +32,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CardsColumn(
     font_m_regular: FontFamily,
-    cards: MutableState<List<Card>>,
-    showDialog: MutableState<Boolean>) {
+    showDialog: MutableState<Boolean>,
+    viewModel: MainViewModel
+) {
+    val cards = viewModel.cards.collectAsState()
     Column {
         Text(
             text = "Мои карты",
@@ -78,7 +85,7 @@ fun CardsColumn(
                             .clickable(
                                 interactionSource = interactionSource,
                                 indication = indication,
-                                onClick = { cards.value = cards.value.toMutableList().apply { removeAt(index) }})
+                                onClick = { viewModel.deleteCard(item) })
                     )
 
                 }
