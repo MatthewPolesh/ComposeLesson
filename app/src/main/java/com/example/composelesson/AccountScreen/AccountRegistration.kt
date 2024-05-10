@@ -144,6 +144,7 @@ fun AccountRegistration(
                     )
                 },
                 onClick = {
+
                     showAlert.value = !showAlert.value
                     viewModel.registerUser(newName, newPhoneNumber, newPassword)
                 },

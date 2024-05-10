@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.material:material:1.7.0-rc01")
     implementation ("com.google.accompanist:accompanist-pager:0.19.0")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.19.0")
@@ -65,6 +67,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.database)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

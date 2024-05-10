@@ -2,22 +2,24 @@ package com.example.composelesson
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.example.composelesson.AccountScreen.Card
 import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.MenuScreen.FoodType
 import com.example.composelesson.MenuScreen.Meel
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import java.time.LocalTime
 
-//Это для логики
+
 @RequiresApi(Build.VERSION_CODES.O)
 class MainViewModel : ViewModel() {
+
+    //Database
+    private val db = Firebase.firestore
+
 
 
     //AccountMenu
@@ -42,36 +44,36 @@ class MainViewModel : ViewModel() {
     val cards = _cards.asStateFlow()
     //AccountMenu--fun
 
-    fun deleteCard(card: Card)
-    {
+    fun deleteCard(card: Card) {
         val tempArr = cards.value.toMutableList()
         tempArr.removeIf { it.number == card.number }
         _cards.value = tempArr
     }
 
-    fun addCard(card: Card){
+    fun addCard(card: Card) {
         _cards.value += card
 
     }
-    fun changeUserInfo(userName: String,userPhone: String){
+
+    fun changeUserInfo(userName: String, userPhone: String) {
         _userName.value = userName
         _userPhone.value = userPhone
     }
-    fun entryUser(userPhone: String, userPassword: String)
-    {
+
+    fun entryUser(userPhone: String, userPassword: String) {
         _userPhone.value = userPhone
         _userPassword.value = userPassword
         _entranceFlag.value = !_entranceFlag.value
     }
-    fun registerUser(userName: String, userPhone: String, userPassword: String)
-    {
+
+    fun registerUser(userName: String, userPhone: String, userPassword: String) {
         _userName.value = userName
         _userPhone.value = userPhone
         _userPassword.value = userPassword
         _registrationFlag.value = !_registrationFlag.value
     }
-    fun Exit()
-    {
+
+    fun Exit() {
         _userName.value = ""
         _userPhone.value = ""
         _entranceFlag.value = !_entranceFlag.value
@@ -134,17 +136,21 @@ class MainViewModel : ViewModel() {
     )
     var mealMenu = _mealMenu.asStateFlow()
 
-    private val _selectedAdress: MutableStateFlow<Adress> = MutableStateFlow(Adress("","",""))
+    private val _selectedAdress: MutableStateFlow<Adress> = MutableStateFlow(Adress("", "", ""))
     val selectedAdress = _selectedAdress
 
 
     //MainMenu--fun
 
-    fun changeAdress(adress: String, house: String, flat: String)
-    {
-        _selectedAdress.value = _selectedAdress.value.copy(adress = adress.trim(), house = house.trim(), flat = flat.trim())
+    fun changeAdress(adress: String, house: String, flat: String) {
+        _selectedAdress.value = _selectedAdress.value.copy(
+            adress = adress.trim(),
+            house = house.trim(),
+            flat = flat.trim()
+        )
     }
-    fun increaseCounter(name: String){
+
+    fun increaseCounter(name: String) {
         if (name != "Приборы") {
             val tempMenu = mealMenu.value.toMutableList()
             val tempShop = shoppingList.value.toMutableList()
@@ -170,22 +176,21 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun decreaseCounter(name: String){
+    fun decreaseCounter(name: String) {
         val tempMenu = mealMenu.value.toMutableList()
         val tempShop = shoppingList.value.toMutableList()
         val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
         val tempShopIndex = tempShop.indexOfFirst { it.name == name }
 
 
-        if ( tempMenu[tempMenuIndex].counter == 1)
-        {
+        if (tempMenu[tempMenuIndex].counter == 1) {
             tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(counter = 0, showPrice = false)
             tempShop.removeIf { it.name == name }
-        }
-        else
-        {
-            tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter - 1)
-            tempShop[tempShopIndex] = tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
+        } else {
+            tempMenu[tempMenuIndex] =
+                tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter - 1)
+            tempShop[tempShopIndex] =
+                tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
         }
         _shoppingList.value = tempShop
         _mealMenu.value = tempMenu
@@ -198,7 +203,7 @@ class MainViewModel : ViewModel() {
     private val _showButtonPayment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showButtonPayment = _showButtonPayment.asStateFlow()
 
-    private  val _orderTimeFlag: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    private val _orderTimeFlag: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val orderTimeFlag = _orderTimeFlag.asStateFlow()
 
     //ShoppingList--info
@@ -241,27 +246,26 @@ class MainViewModel : ViewModel() {
     val orderComment = _orderComment
 
 
-
     //ShoppingList--fun
-    fun changeOrderTimeFlag(){
+    fun changeOrderTimeFlag() {
         _orderTimeFlag.value = !_orderTimeFlag.value
     }
-    fun changeOrderComment(newComment: String)
-    {
+
+    fun changeOrderComment(newComment: String) {
         _orderComment.value = newComment
     }
 
-    fun countOrderSum(){
+    fun countOrderSum() {
         if (_shoppingList.value.size == 1) {
             _showButtonPayment.value = false
-             createOrderSum(0)
+            createOrderSum(0)
         } else {
             _showButtonPayment.value = true
             createOrderSum(_shoppingList.value.sumBy { it.price * it.counter })
         }
     }
 
-    fun createOrderSum(sum: Int){
+    fun createOrderSum(sum: Int) {
         _orderStr.value = "Оплатить $sum₽"
 
     }

@@ -1,4 +1,4 @@
-package ShoppingScreen
+package com.example.composelesson.ShoppingScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi

@@ -1,4 +1,4 @@
-package ShoppingScreen
+package com.example.composelesson.ShoppingScreen
 
 import android.annotation.SuppressLint
 import android.os.Build
