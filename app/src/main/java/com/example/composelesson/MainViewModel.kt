@@ -1,8 +1,11 @@
 package com.example.composelesson
 
+import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.composelesson.AccountScreen.Card
 import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.MenuScreen.FoodType
@@ -11,6 +14,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 
 
@@ -18,14 +22,17 @@ import java.time.LocalTime
 class MainViewModel : ViewModel() {
 
     //Database
-    private val db = Firebase.firestore
 
+    private val repository: FireBaseAccount = FireBaseAccount()
 
 
     //AccountMenu
     //AccountMenu--flags
     private val _registrationFlag: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val registrationFlag = _registrationFlag.asStateFlow()
+
+    private val _registrationError = MutableStateFlow<String?>(null)
+    val registrationError = _registrationError.asStateFlow()
 
     private val _entranceFlag: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val entranceFlag = _entranceFlag
@@ -60,24 +67,65 @@ class MainViewModel : ViewModel() {
         _userPhone.value = userPhone
     }
 
-    fun entryUser(userPhone: String, userPassword: String) {
-        _userPhone.value = userPhone
-        _userPassword.value = userPassword
-        _entranceFlag.value = !_entranceFlag.value
+    @SuppressLint("SuspiciousIndentation")
+    fun signInUser(email: String, password: String) {
+
+        viewModelScope.launch {
+            val result = repository.signInUser(email, password)
+            if (result.isSuccess)
+            {
+                _entranceFlag.value = true
+                val userdoc = repository.firestore.collection("users").document(repository.auth.currentUser!!.uid)
+                userdoc.get().addOnSuccessListener { document ->
+                    if (document != null)
+                    {
+                        Log.d("Mylog", "$document")
+                        _userName.value = document.getString("name").toString()
+                        _userPhone.value = document.getString("phone").toString()
+                    }
+                }
+            }
+            else
+                _entranceFlag.value = false
+        }
     }
 
-    fun registerUser(userName: String, userPhone: String, userPassword: String) {
-        _userName.value = userName
-        _userPhone.value = userPhone
-        _userPassword.value = userPassword
-        _registrationFlag.value = !_registrationFlag.value
+    fun registerUser(email: String, password: String, name: String, phone: String) {
+        viewModelScope.launch {
+            val registrationResult = repository.registerUser(email, password, name, phone)
+            Log.d("MyLog","$registrationResult")
+            if (registrationResult.isSuccess) {
+                val uid = registrationResult.getOrNull()
+                if (uid != null) {
+                    val userInfo = mapOf(
+                        "name" to name,
+                        "email" to email,
+                        "phone" to phone
+                    )
+                    val firestoreResult = repository.addUserToFirestore(uid, userInfo)
+                    if (firestoreResult.isSuccess) {
+                        _registrationFlag.value = true
+                        _userName.value = name
+                        _userPhone.value = phone
+                    } else {
+                        _registrationError.value = firestoreResult.exceptionOrNull()?.message
+                    }
+                } else {
+                    _registrationError.value = "UID is null"
+                }
+            } else {
+                _registrationError.value = registrationResult.exceptionOrNull()?.message
+            }
+        }
     }
 
     fun Exit() {
+        viewModelScope.launch { repository.singOut() }
         _userName.value = ""
         _userPhone.value = ""
-        _entranceFlag.value = !_entranceFlag.value
-        _registrationFlag.value = !_registrationFlag.value
+        _entranceFlag.value = false
+        _registrationFlag.value = false
+        Log.d("MyLog", "${_entranceFlag.value}, ${_registrationFlag.value}")
     }
 
     //MainMenu

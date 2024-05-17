@@ -45,6 +45,7 @@ fun AccountRegistration(
     var newName by remember { mutableStateOf("") }
     var newPhoneNumber by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
+    var newMail by remember { mutableStateOf("") }
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
         title = {
@@ -80,7 +81,31 @@ fun AccountRegistration(
                             color = colorResource(id = R.color.white)
                         )
                     },
+                    )
+                OutlinedTextField(
+                    value = newMail,
+                    colors = TextFieldDefaults.textFieldColors(
+                        focusedIndicatorColor = colorResource(id = R.color.white),
+                        unfocusedIndicatorColor = colorResource(id = R.color.white),
+                        containerColor = colorResource(id = R.color.element_background),
+                        cursorColor = colorResource(id = R.color.yellow)
+                    ),
+                    shape = RoundedCornerShape(15.dp),
+                    textStyle = TextStyle(
+                        color = colorResource(id = R.color.white),
+                        fontFamily = font_m_regular,
+                        fontSize = 15.sp
 
+                    ),
+                    onValueChange = { if (it.length <= 23) newMail = it },
+                    label = {
+                        Text(
+                            text = "Почта",
+                            fontFamily = font_m_light,
+                            fontSize = 10.sp,
+                            color = colorResource(id = R.color.white)
+                        )
+                    },
                     )
                 OutlinedTextField(
                     value = newPhoneNumber,
@@ -146,7 +171,7 @@ fun AccountRegistration(
                 onClick = {
 
                     showAlert.value = !showAlert.value
-                    viewModel.registerUser(newName, newPhoneNumber, newPassword)
+                    viewModel.registerUser(newMail,newPassword, newName, newPhoneNumber)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )

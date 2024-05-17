@@ -39,10 +39,9 @@ fun AccountEntrance(
     font_m_light: FontFamily,
     font_m_semibold: FontFamily,
     showAlert: MutableState<Boolean>,
-    phoneMask: Mask,
     viewModel: MainViewModel
 ) {
-    var newPhone by remember { mutableStateOf("")}
+    var newMail by remember { mutableStateOf("")}
     var newPassword by remember { mutableStateOf("")}
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
@@ -53,7 +52,7 @@ fun AccountEntrance(
         text = {
             Column() {
                 OutlinedTextField(
-                    value = newPhone,
+                    value = newMail,
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = colorResource(id = R.color.white),
                         unfocusedIndicatorColor = colorResource(id = R.color.white),
@@ -64,19 +63,16 @@ fun AccountEntrance(
                         color = colorResource(id = R.color.white),
                         fontFamily = font_m_regular,
                         fontSize = 15.sp
-
                     ),
-                    visualTransformation = phoneMask,
-                    onValueChange = { if (it.length <= 10) newPhone = it },
+                    onValueChange = { if (it.length <= 23) newMail = it },
                     label = {
                         Text(
-                            text = "Номер телефона",
+                            text = "Почта",
                             fontFamily = font_m_light,
                             fontSize = 10.sp,
                             color = colorResource(id = R.color.white)
                         )
                     },
-
                     )
                 OutlinedTextField(
                     value = newPassword,
@@ -110,7 +106,7 @@ fun AccountEntrance(
                 modifier = Modifier.size(18.dp)
             )},
             onClick = { showAlert.value = !showAlert.value
-                viewModel.entryUser(newPhone, newPassword)
+                viewModel.signInUser(newMail, newPassword)
             },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
         )},

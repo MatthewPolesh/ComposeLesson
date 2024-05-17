@@ -46,14 +46,15 @@ fun AccountMenu(
 ) {
     val registrationFlag = viewModel.registrationFlag.collectAsState()
     val entranceFlag = viewModel.entranceFlag.collectAsState()
+    val userName = viewModel.userName.collectAsState()
+    val userPhone = viewModel.userPhone.collectAsState()
 
     val showAlertAccount = remember { mutableStateOf(false)}
     val showAlertEntrance = remember { mutableStateOf(false)}
     val showAlertRegistration = remember { mutableStateOf(false) }
     val showDialogCard = remember { mutableStateOf(false) }
 
-    val card = remember { mutableStateOf(Card("","","")) }
-    val cardsList = remember { mutableStateOf<List<Card>>(emptyList()) }
+
     val cardMask = Mask("####-####-####-####")
     val dateMask = Mask("##/##")
     val phoneMask = Mask( "+7 (###) ### ##-##")
@@ -83,7 +84,6 @@ fun AccountMenu(
             font_m_light = font_m_light,
             font_m_semibold = font_m_semibold,
             showAlert = showAlertEntrance,
-            phoneMask = phoneMask,
             viewModel = viewModel
         )
 
@@ -154,7 +154,7 @@ fun AccountMenu(
                             tint = colorResource(id = R.color.white)
                         )
                         Text(
-                            text = viewModel.userName.value,
+                            text = userName.value,
                             fontSize = 15.sp,
                             fontFamily = font_m_regular,
                             color = colorResource(id = R.color.white)
@@ -172,7 +172,7 @@ fun AccountMenu(
                         )
                         BasicTextField(
                             onValueChange = {},
-                            value = viewModel.userPhone.value,
+                            value = userPhone.value,
                             readOnly = true,
                             textStyle = TextStyle(
                             fontSize = 15.sp,
