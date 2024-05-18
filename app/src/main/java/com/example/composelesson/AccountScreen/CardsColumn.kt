@@ -85,7 +85,7 @@ fun CardsColumn(
                             .clickable(
                                 interactionSource = interactionSource,
                                 indication = indication,
-                                onClick = { viewModel.deleteCard(item) })
+                                onClick = { viewModel.deleteBankCard(item) })
                     )
 
                 }

@@ -3,6 +3,7 @@ package com.example.composelesson
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.text.BoringLayout
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
@@ -26,11 +27,19 @@ class MainViewModel : ViewModel() {
 
     private val repository: FireBaseAccount = FireBaseAccount()
 
+    private val userID = repository.auth.currentUser?.uid
+
+    private var mapCards: List<Pair<String, Card?>> = emptyList()
+
+
 
     //AccountMenu
     //AccountMenu--flags
     private val _registrationFlag: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val registrationFlag = _registrationFlag.asStateFlow()
+
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading = _isLoading
 
     private val _registrationError = MutableStateFlow<String?>(null)
     val registrationError = _registrationError.asStateFlow()
@@ -52,16 +61,6 @@ class MainViewModel : ViewModel() {
     val cards = _cards.asStateFlow()
     //AccountMenu--fun
 
-    fun deleteCard(card: Card) {
-        val tempArr = cards.value.toMutableList()
-        tempArr.removeIf { it.number == card.number }
-        _cards.value = tempArr
-    }
-
-    fun addCard(card: Card) {
-        _cards.value += card
-
-    }
 
     fun changeUserInfo(userName: String, userPhone: String) {
         _userName.value = userName
@@ -70,44 +69,43 @@ class MainViewModel : ViewModel() {
 
     @SuppressLint("SuspiciousIndentation")
     fun signInUser(email: String, password: String) {
-
+        _isLoading.value = true
         viewModelScope.launch {
             val result = repository.signInUser(email, password)
-            if (result.isSuccess)
-            {
+            if (result.isSuccess) {
                 _entranceFlag.value = true
-                val userdoc = repository.firestore.collection("users").document(repository.auth.currentUser!!.uid)
+                val userdoc = repository.firestore.collection("users")
+                    .document(repository.auth.currentUser!!.uid)
                 userdoc.get().addOnSuccessListener { document ->
-                    if (document != null)
-                    {
-                        Log.d("Mylog", "$document")
+                    if (document != null) {
                         _userName.value = document.getString("name").toString()
                         _userPhone.value = document.getString("phone").toString()
+                        loadCards()
+
                     }
                 }
-            }
-            else
-                _entranceFlag.value = false
+            } else _entranceFlag.value = false
         }
     }
 
     fun registerUser(email: String, password: String, name: String, phone: String) {
         viewModelScope.launch {
             val registrationResult = repository.registerUser(email, password, name, phone)
-            Log.d("MyLog","$registrationResult")
+            Log.d("MyLog", "$registrationResult")
             if (registrationResult.isSuccess) {
                 val uid = registrationResult.getOrNull()
+
                 if (uid != null) {
                     val userInfo = mapOf(
-                        "name" to name,
-                        "email" to email,
-                        "phone" to phone
+                        "name" to name, "email" to email, "phone" to phone
                     )
                     val firestoreResult = repository.addUserToFirestore(uid, userInfo)
                     if (firestoreResult.isSuccess) {
                         _registrationFlag.value = true
+                        _isLoading.value = true
                         _userName.value = name
                         _userPhone.value = phone
+                        loadCards()
                     } else {
                         _registrationError.value = firestoreResult.exceptionOrNull()?.message
                     }
@@ -136,6 +134,48 @@ class MainViewModel : ViewModel() {
         _registrationFlag.value = false
         Log.d("MyLog", "${_entranceFlag.value}, ${_registrationFlag.value}")
     }
+
+    fun addUserCard(cardNumber: String, year: String, cvc: String) {
+        val card = Card(cardNumber, year, cvc)
+        viewModelScope.launch {
+            repository.addBankCard(userID, card) {
+                loadCards()
+            }
+        }
+    }
+
+    fun deleteBankCard(card: Card) {
+        val cardId = mapCards.firstOrNull{it.second == card}?.first
+        viewModelScope.launch {
+            if (cardId != null) {
+                repository.deleteBankCard(userID, cardId) {
+                    loadCards()
+
+                }
+            }
+        }
+
+    }
+
+    fun loadCards(){
+        viewModelScope.launch {
+            repository.getBankCards(userID){
+                cards ->
+                val tempArr = mutableListOf<Card>()
+                for ((cardID, card) in cards){
+                    if (card != null) {
+                        tempArr.add(card)
+                    }
+                }
+                _cards.value = tempArr
+                mapCards = cards
+                _isLoading.value = false
+            }
+        }
+
+    }
+
+
 
     //MainMenu
     //MainMenu--flags
@@ -178,17 +218,39 @@ class MainViewModel : ViewModel() {
     private val Meel28 = Meel("Напиток3", "Описание", 999, FoodType.DRINKS)
     private val Meel29 = Meel("Напиток4", "Описание", 999, FoodType.DRINKS)
     private val Meel30 = Meel("Напиток5", "Описание", 999, FoodType.DRINKS)
-    private val tools = Meel("Приборы", "Вилка, салфетки", 0, FoodType.TOOLS, 1,true)
+    private val tools = Meel("Приборы", "Вилка, салфетки", 0, FoodType.TOOLS, 1, true)
     private var _mealMenu: MutableStateFlow<List<Meel>> = MutableStateFlow<List<Meel>>(
         listOf(
-            Meel1, Meel2, Meel3, Meel4,
-            Meel5, Meel6, Meel7, Meel8,
-            Meel9, Meel10, Meel11, Meel12,
-            Meel13, Meel14, Meel15, Meel16,
-            Meel17, Meel18, Meel19, Meel20,
-            Meel21, Meel22, Meel23, Meel24,
-            Meel25, Meel26, Meel27, Meel28,
-            Meel29, Meel30
+            Meel1,
+            Meel2,
+            Meel3,
+            Meel4,
+            Meel5,
+            Meel6,
+            Meel7,
+            Meel8,
+            Meel9,
+            Meel10,
+            Meel11,
+            Meel12,
+            Meel13,
+            Meel14,
+            Meel15,
+            Meel16,
+            Meel17,
+            Meel18,
+            Meel19,
+            Meel20,
+            Meel21,
+            Meel22,
+            Meel23,
+            Meel24,
+            Meel25,
+            Meel26,
+            Meel27,
+            Meel28,
+            Meel29,
+            Meel30
         )
     )
     var mealMenu = _mealMenu.asStateFlow()
@@ -201,42 +263,36 @@ class MainViewModel : ViewModel() {
 
     fun changeAdress(adress: String, house: String, flat: String) {
         _selectedAdress.value = _selectedAdress.value.copy(
-            adress = adress.trim(),
-            house = house.trim(),
-            flat = flat.trim()
+            adress = adress.trim(), house = house.trim(), flat = flat.trim()
         )
     }
 
     fun increaseCounter(name: String) {
 
-            val tempMenu = mealMenu.value.toMutableList()
-            val tempShop = shoppingList.value.toMutableList()
-            val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
-            val tempShopIndex = tempShop.indexOfFirst { it.name == name }
-            if(name != "Приборы")
-            {
-                if (tempMenu[tempMenuIndex].counter == 0) {
-                    tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
-                        counter = tempMenu[tempMenuIndex].counter + 1,
-                        showPrice = true
-                    )
-                    if (tempShopIndex == -1)
-                        tempShop += tempMenu[tempMenuIndex]
-                } else {
-                    tempMenu[tempMenuIndex] =
-                        tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter + 1)
-                    tempShop[tempShopIndex] =
-                        tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
-                }
+        val tempMenu = mealMenu.value.toMutableList()
+        val tempShop = shoppingList.value.toMutableList()
+        val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
+        val tempShopIndex = tempShop.indexOfFirst { it.name == name }
+        if (name != "Приборы") {
+            if (tempMenu[tempMenuIndex].counter == 0) {
+                tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
+                    counter = tempMenu[tempMenuIndex].counter + 1, showPrice = true
+                )
+                if (tempShopIndex == -1) tempShop += tempMenu[tempMenuIndex]
+            } else {
+                tempMenu[tempMenuIndex] =
+                    tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter + 1)
+                tempShop[tempShopIndex] =
+                    tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
             }
-        else
-            {
-                tempShop[tempShopIndex] = tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
-            }
+        } else {
+            tempShop[tempShopIndex] =
+                tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
+        }
 
-            _shoppingList.value = tempShop
-            _mealMenu.value = tempMenu
-            countOrderSum()
+        _shoppingList.value = tempShop
+        _mealMenu.value = tempMenu
+        countOrderSum()
 
     }
 
@@ -257,9 +313,7 @@ class MainViewModel : ViewModel() {
                 tempShop[tempShopIndex] =
                     tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
             }
-        }
-        else
-        {
+        } else {
             if (tempShop[tempShopIndex].counter != 1) {
                 tempShop[tempShopIndex] =
                     tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
@@ -275,7 +329,7 @@ class MainViewModel : ViewModel() {
     //ShoppingList
     //ShoppingList--flags
 
-    private val _orderCreated: MutableStateFlow<Boolean> = MutableStateFlow( false)
+    private val _orderCreated: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val orderCreated = _orderCreated
 
     private val _showButtonPayment: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -332,7 +386,8 @@ class MainViewModel : ViewModel() {
     fun changeOrderComment(newComment: String) {
         _orderComment.value = newComment
     }
-    fun createOrder(){
+
+    fun createOrder() {
         _orderCreated.value = true
     }
 

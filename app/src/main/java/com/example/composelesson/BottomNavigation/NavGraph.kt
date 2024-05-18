@@ -1,5 +1,7 @@
 package com.example.composelesson.BottomNavigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.composelesson.ShoppingScreen.ShoppingScreen
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -14,6 +16,7 @@ import com.example.composelesson.MainViewModel
 import com.example.composelesson.MenuScreen.MenuScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(navHostController: NavHostController) {
     val viewModel = viewModel<MainViewModel>()

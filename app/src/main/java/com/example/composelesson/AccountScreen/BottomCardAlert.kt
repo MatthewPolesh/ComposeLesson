@@ -155,7 +155,7 @@ fun BottomCardAlert(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
                     showDialog.value = !showDialog.value
-                    viewModel.addCard(Card(number = newName, cvc = newCVC, data = newDate))
+                    viewModel.addUserCard(newName,newCVC,newDate)
                           },
                 content = {
                     Box(

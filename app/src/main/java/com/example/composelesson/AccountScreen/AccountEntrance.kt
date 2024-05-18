@@ -31,8 +31,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.example.composelesson.MainViewModel
 import com.example.composelesson.R
+import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -140,6 +142,7 @@ fun AccountEntrance(
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow)),
                     onClick = { showAlert.value = !showAlert.value }
                 )
+
                 Button(
                     content = {
                         Icon(
@@ -151,7 +154,9 @@ fun AccountEntrance(
                     },
                     onClick = {
                         showAlert.value = !showAlert.value
-                        viewModel.signInUser(newMail, newPassword)
+                        viewModel.viewModelScope.launch {
+                            viewModel.signInUser(newMail, newPassword)
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
                 )

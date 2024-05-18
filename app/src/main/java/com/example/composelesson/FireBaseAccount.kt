@@ -3,6 +3,7 @@ package com.example.composelesson
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import com.example.composelesson.AccountScreen.Card
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,9 @@ interface UserRepository {
     suspend fun addUserToFirestore(uid: String, userInfo: Map<String, Any>): Result<Unit>
     suspend fun singOut()
     suspend fun sendPasswordResetEmail(email: String, context: Context, callback: (Boolean, String?) -> Unit)
+    suspend fun addBankCard(userId: String?, card: Card, callback: (Boolean) -> Unit)
+    suspend fun deleteBankCard(userId: String?, cardId: String, callback: (Boolean) -> Unit)
+    suspend fun getBankCards(userId: String?, callback: (List<Pair<String, Card?>>) -> Unit)
 }
 
 
@@ -70,6 +74,61 @@ class FireBaseAccount : UserRepository {
                     callback(false, task.exception?.message)
                 }
             }
+    }
+
+    override suspend fun addBankCard(userId: String?, card: Card, callback: (Boolean) -> Unit) {
+        if (userId != null) {
+            firestore.collection("users")
+                .document(userId)
+                .collection("cards")
+                .add(card)
+                .addOnSuccessListener { documentReference ->
+                    // Bank card successfully added
+                    callback(true)
+                }
+                .addOnFailureListener { e ->
+                    // Error adding bank card
+                    callback(false)
+                }
+        }
+    }
+
+    override suspend fun deleteBankCard(userId: String?, cardId: String, callback: (Boolean) -> Unit) {
+        if (userId != null) {
+            firestore.collection("users")
+                .document(userId)
+                .collection("cards")
+                .document(cardId)
+                .delete()
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener { e ->
+                    callback(false)
+                }
+        }
+    }
+
+    override suspend fun getBankCards(
+        userId: String?,
+        callback: (List<Pair<String, Card?>>) -> Unit
+    ) {
+        if (userId != null) {
+            firestore.collection("users")
+                .document(userId)
+                .collection("cards")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val cards = querySnapshot.documents.map { document ->
+                        val card = document.toObject(Card::class.java)
+                        Pair(document.id, card)
+                    }
+                    callback(cards)
+                }
+                .addOnFailureListener { e ->
+                    callback(emptyList())
+                }
+        }
     }
 
     override suspend fun singOut() {

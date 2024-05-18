@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.Font
@@ -26,24 +27,28 @@ fun AccountScreen(viewModel: MainViewModel) {
     val montserrat_light = FontFamily(Font(R.font.montserratalternateslight, FontWeight.Normal))
     val montserrat_semibold =
         FontFamily(Font(R.font.montserratalternatessemibold, FontWeight.Normal))
+    val isLoading = viewModel.isLoading.collectAsState()
 
 
+    if (!isLoading.value) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = colorResource(id = R.color.background))
+                .padding(horizontal = 10.dp)
+        ) {
+            AccountHeader(
+                font_caveat = caveat
+            )
+            AccountMenu(
+                font_m_semibold = montserrat_semibold,
+                font_m_regular = montserrat_regular,
+                font_m_light = montserrat_light,
+                viewModel = viewModel
+            )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(id = R.color.background))
-            .padding(horizontal = 10.dp)
-    ) {
-        AccountHeader(
-            font_caveat = caveat
-        )
-        AccountMenu(
-            font_m_semibold = montserrat_semibold,
-            font_m_regular = montserrat_regular,
-            font_m_light = montserrat_light,
-            viewModel = viewModel
-        )
+        }
+    } else
+        ProgressIndicator()
 
-    }
 }
