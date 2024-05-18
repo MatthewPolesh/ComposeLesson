@@ -141,8 +141,8 @@ class MainViewModel : ViewModel() {
     //MainMenu--flags
     private val _showPrice: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var showPrice = _showPrice.asStateFlow()
-    //MainMenu--info
 
+    //MainMenu--info
 
     private val _userAdress: MutableStateFlow<Adress> = MutableStateFlow(Adress("", "", ""))
     val userAdress = _userAdress.asStateFlow()
@@ -178,7 +178,7 @@ class MainViewModel : ViewModel() {
     private val Meel28 = Meel("Напиток3", "Описание", 999, FoodType.DRINKS)
     private val Meel29 = Meel("Напиток4", "Описание", 999, FoodType.DRINKS)
     private val Meel30 = Meel("Напиток5", "Описание", 999, FoodType.DRINKS)
-    private val tools = Meel("Приборы", "Вилка, салфетки", 0, FoodType.TOOLS, 0)
+    private val tools = Meel("Приборы", "Вилка, салфетки", 0, FoodType.TOOLS, 1,true)
     private var _mealMenu: MutableStateFlow<List<Meel>> = MutableStateFlow<List<Meel>>(
         listOf(
             Meel1, Meel2, Meel3, Meel4,
@@ -208,29 +208,36 @@ class MainViewModel : ViewModel() {
     }
 
     fun increaseCounter(name: String) {
-        if (name != "Приборы") {
+
             val tempMenu = mealMenu.value.toMutableList()
             val tempShop = shoppingList.value.toMutableList()
             val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
             val tempShopIndex = tempShop.indexOfFirst { it.name == name }
-
-            if (tempMenu[tempMenuIndex].counter == 0) {
-                tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
-                    counter = tempMenu[tempMenuIndex].counter + 1,
-                    showPrice = true
-                )
-                if (tempShopIndex == -1)
-                    tempShop += tempMenu[tempMenuIndex]
-            } else {
-                tempMenu[tempMenuIndex] =
-                    tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter + 1)
-                tempShop[tempShopIndex] =
-                    tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
+            if(name != "Приборы")
+            {
+                if (tempMenu[tempMenuIndex].counter == 0) {
+                    tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(
+                        counter = tempMenu[tempMenuIndex].counter + 1,
+                        showPrice = true
+                    )
+                    if (tempShopIndex == -1)
+                        tempShop += tempMenu[tempMenuIndex]
+                } else {
+                    tempMenu[tempMenuIndex] =
+                        tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter + 1)
+                    tempShop[tempShopIndex] =
+                        tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
+                }
             }
+        else
+            {
+                tempShop[tempShopIndex] = tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter + 1)
+            }
+
             _shoppingList.value = tempShop
             _mealMenu.value = tempMenu
             countOrderSum()
-        }
+
     }
 
     fun decreaseCounter(name: String) {
@@ -239,15 +246,25 @@ class MainViewModel : ViewModel() {
         val tempMenuIndex = tempMenu.indexOfFirst { it.name == name }
         val tempShopIndex = tempShop.indexOfFirst { it.name == name }
 
+        if (name != "Приборы") {
+            if (tempMenu[tempMenuIndex].counter == 1) {
+                tempMenu[tempMenuIndex] =
+                    tempMenu[tempMenuIndex].copy(counter = 0, showPrice = false)
+                tempShop.removeIf { it.name == name }
+            } else {
+                tempMenu[tempMenuIndex] =
+                    tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter - 1)
+                tempShop[tempShopIndex] =
+                    tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
+            }
+        }
+        else
+        {
+            if (tempShop[tempShopIndex].counter != 1) {
+                tempShop[tempShopIndex] =
+                    tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
+            }
 
-        if (tempMenu[tempMenuIndex].counter == 1) {
-            tempMenu[tempMenuIndex] = tempMenu[tempMenuIndex].copy(counter = 0, showPrice = false)
-            tempShop.removeIf { it.name == name }
-        } else {
-            tempMenu[tempMenuIndex] =
-                tempMenu[tempMenuIndex].copy(counter = tempMenu[tempMenuIndex].counter - 1)
-            tempShop[tempShopIndex] =
-                tempShop[tempShopIndex].copy(counter = tempShop[tempShopIndex].counter - 1)
         }
         _shoppingList.value = tempShop
         _mealMenu.value = tempMenu
@@ -257,6 +274,10 @@ class MainViewModel : ViewModel() {
 
     //ShoppingList
     //ShoppingList--flags
+
+    private val _orderCreated: MutableStateFlow<Boolean> = MutableStateFlow( false)
+    val orderCreated = _orderCreated
+
     private val _showButtonPayment: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showButtonPayment = _showButtonPayment.asStateFlow()
 
@@ -310,6 +331,9 @@ class MainViewModel : ViewModel() {
 
     fun changeOrderComment(newComment: String) {
         _orderComment.value = newComment
+    }
+    fun createOrder(){
+        _orderCreated.value = true
     }
 
     fun countOrderSum() {

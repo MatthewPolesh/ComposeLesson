@@ -73,7 +73,7 @@ fun ShoppingList(
     val minuteState = viewModel.selectedMinute.collectAsState()
     val payingTypeState = viewModel.payingType.collectAsState()
     val shoppingList = viewModel.shoppingList.collectAsState()
-    val PayBottonFlag = viewModel.showButtonPayment.collectAsState()
+    val payBottonFlag = viewModel.showButtonPayment.collectAsState()
     val orderStr = viewModel.orderStr.collectAsState()
     val timeFlag = viewModel.orderTimeFlag.collectAsState()
 
@@ -165,12 +165,11 @@ fun ShoppingList(
             }
 
         }
-
+        Divider(modifier = Modifier.padding(vertical = 15.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 15.dp)
                 .clip(shape = RoundedCornerShape(20.dp))
                 .border(
                     width = 0.5.dp,
@@ -339,7 +338,7 @@ fun ShoppingList(
                 )
             }
         }
-        if (PayBottonFlag.value) {
+        if (payBottonFlag.value) {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -348,7 +347,7 @@ fun ShoppingList(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(id = R.color.yellow)
                 ),
-                onClick = {},
+                onClick = {viewModel.createOrder()},
                 content = {
                     Box(
                         contentAlignment = Alignment.Center

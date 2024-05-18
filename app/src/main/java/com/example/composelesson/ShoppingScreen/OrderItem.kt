@@ -37,7 +37,7 @@ import com.example.composelesson.R
 @SuppressLint("StateFlowValueCalledInComposition")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Item(
+fun OrderItem(
     font_m_semibold: FontFamily,
     font_m_regular: FontFamily,
     font_m_light: FontFamily,
@@ -91,7 +91,6 @@ fun Item(
                         .clip(shape = RoundedCornerShape(20.dp))
                         .background(color = colorResource(id = R.color.element_background))
                         .clickable {
-                            viewModel.increaseCounter(meal.name)
                         })
                 {
                     if (!meal.showPrice) {
@@ -114,7 +113,6 @@ fun Item(
                                     .padding(start = 8.dp, end = 5.dp, top = 8.dp, bottom = 8.dp)
                                     .size(18.dp)
                                     .clickable {
-                                        viewModel.decreaseCounter(meal.name)
                                     })
                             Text(
                                 textAlign = TextAlign.Center,
@@ -132,7 +130,6 @@ fun Item(
                                     .padding(start = 5.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
                                     .size(18.dp)
                                     .clickable {
-                                        viewModel.increaseCounter(meal.name)
                                     })
                         }
 
