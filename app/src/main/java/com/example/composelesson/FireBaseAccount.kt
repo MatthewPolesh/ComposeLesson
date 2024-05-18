@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.firestoreSettings
 
 
 interface UserRepository {
@@ -29,7 +30,9 @@ interface UserRepository {
 class FireBaseAccount : UserRepository {
     private val _auth: FirebaseAuth = FirebaseAuth.getInstance()
     val auth = _auth
-    private val _firestore = Firebase.firestore
+    private val _firestore = Firebase.firestore.apply {
+        firestoreSettings = firestoreSettings{ isPersistenceEnabled = true }
+    }
     val firestore = _firestore
 
     override suspend fun registerUser(email: String, password: String, name: String, phone: String): Result<String?> =

@@ -13,6 +13,7 @@ import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.MenuScreen.FoodType
 import com.example.composelesson.MenuScreen.Meel
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ import java.time.LocalTime
 @RequiresApi(Build.VERSION_CODES.O)
 class MainViewModel : ViewModel() {
 
+
     //Database
 
     private val repository: FireBaseAccount = FireBaseAccount()
@@ -30,6 +32,10 @@ class MainViewModel : ViewModel() {
     private val userID = repository.auth.currentUser?.uid
 
     private var mapCards: List<Pair<String, Card?>> = emptyList()
+
+    init {
+        checkAuthState()
+    }
 
 
 
@@ -67,6 +73,28 @@ class MainViewModel : ViewModel() {
         _userPhone.value = userPhone
     }
 
+    private fun checkAuthState() {
+        repository.auth.addAuthStateListener { auth ->
+            val user = auth.currentUser
+            if (user != null) {
+                _entranceFlag.value = true
+                val userdoc = repository.firestore.collection("users").document(user.uid)
+                userdoc.get(Source.CACHE).addOnSuccessListener { document ->
+                    if (document != null) {
+                        _userName.value = document.getString("name").toString()
+                        _userPhone.value = document.getString("phone").toString()
+                        loadCards()
+                    }
+                }.addOnFailureListener {
+                    _userName.value = ""
+                    _userPhone.value = ""
+                }
+            } else {
+                _entranceFlag.value = false
+            }
+        }
+    }
+
     @SuppressLint("SuspiciousIndentation")
     fun signInUser(email: String, password: String) {
         _isLoading.value = true
@@ -91,7 +119,6 @@ class MainViewModel : ViewModel() {
     fun registerUser(email: String, password: String, name: String, phone: String) {
         viewModelScope.launch {
             val registrationResult = repository.registerUser(email, password, name, phone)
-            Log.d("MyLog", "$registrationResult")
             if (registrationResult.isSuccess) {
                 val uid = registrationResult.getOrNull()
 
