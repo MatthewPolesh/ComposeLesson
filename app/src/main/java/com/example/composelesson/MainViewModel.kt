@@ -1,6 +1,7 @@
 package com.example.composelesson
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -115,6 +116,14 @@ class MainViewModel : ViewModel() {
                 }
             } else {
                 _registrationError.value = registrationResult.exceptionOrNull()?.message
+            }
+        }
+    }
+
+    fun resetUserPassword(email: String, context: Context, callback: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            repository.sendPasswordResetEmail(email, context) { success, message ->
+                callback(success, message)
             }
         }
     }

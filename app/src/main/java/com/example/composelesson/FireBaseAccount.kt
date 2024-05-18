@@ -1,19 +1,24 @@
 package com.example.composelesson
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.firestore
 
-//Работа с данными
 
 interface UserRepository {
     suspend fun registerUser(email: String, password: String, name: String, phone: String): Result<String?>
     suspend fun signInUser(email: String, password: String): Result<Unit>
     suspend fun addUserToFirestore(uid: String, userInfo: Map<String, Any>): Result<Unit>
     suspend fun singOut()
+    suspend fun sendPasswordResetEmail(email: String, context: Context, callback: (Boolean, String?) -> Unit)
 }
 
 
@@ -54,6 +59,18 @@ class FireBaseAccount : UserRepository {
                 return@withContext Result.failure(e)
             }
         }
+
+    override suspend fun sendPasswordResetEmail(email: String, context: Context, callback: (Boolean, String?) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+
+                    callback(true, null)
+                } else {
+                    callback(false, task.exception?.message)
+                }
+            }
+    }
 
     override suspend fun singOut() {
         auth.signOut()

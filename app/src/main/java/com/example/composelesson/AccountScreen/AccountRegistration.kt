@@ -97,7 +97,7 @@ fun AccountRegistration(
                         fontSize = 15.sp
 
                     ),
-                    onValueChange = { if (it.length <= 23) newMail = it },
+                    onValueChange = { if (it.length <= 30) newMail = it },
                     label = {
                         Text(
                             text = "Почта",
@@ -146,7 +146,7 @@ fun AccountRegistration(
                         fontFamily = font_m_regular,
                         fontSize = 15.sp
                     ),
-                    onValueChange = { if (it.length <= 20) newPassword = it },
+                    onValueChange = { if (it.length <= 30) newPassword = it },
                     label = {
                         Text(
                             text = "Пароль",

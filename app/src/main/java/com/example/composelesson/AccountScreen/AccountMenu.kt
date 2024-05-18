@@ -50,14 +50,25 @@ fun AccountMenu(
     val userPhone = viewModel.userPhone.collectAsState()
 
     val showAlertAccount = remember { mutableStateOf(false)}
+    val showAlertPassword = remember { mutableStateOf(false) }
     val showAlertEntrance = remember { mutableStateOf(false)}
     val showAlertRegistration = remember { mutableStateOf(false) }
     val showDialogCard = remember { mutableStateOf(false) }
 
-
     val cardMask = Mask("####-####-####-####")
     val dateMask = Mask("##/##")
     val phoneMask = Mask( "+7 (###) ### ##-##")
+
+    if (showAlertPassword.value)
+    {
+        PasswordAlert(
+            font_m_regular = font_m_regular,
+            font_m_light = font_m_light,
+            font_m_semibold = font_m_semibold,
+            showAlert = showAlertPassword,
+            viewModel = viewModel
+        )
+    }
 
     if (showAlertAccount.value){
         AccountAlert(
@@ -84,6 +95,7 @@ fun AccountMenu(
             font_m_light = font_m_light,
             font_m_semibold = font_m_semibold,
             showAlert = showAlertEntrance,
+            showAlertPassword = showAlertPassword,
             viewModel = viewModel
         )
 
