@@ -79,16 +79,23 @@ class MainViewModel : ViewModel() {
             if (user != null) {
                 _entranceFlag.value = true
                 val userdoc = repository.firestore.collection("users").document(user.uid)
-                userdoc.get(Source.CACHE).addOnSuccessListener { document ->
-                    if (document != null) {
-                        _userName.value = document.getString("name").toString()
-                        _userPhone.value = document.getString("phone").toString()
-                        loadCards()
+                userdoc.get(Source.CACHE)
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+                            _userName.value = document.getString("name").toString()
+                            _userPhone.value = document.getString("phone").toString()
+                            loadCards()
+                        } else {
+                            Log.e("Firestore", "Document does not exist or is null")
+                            _userName.value = ""
+                            _userPhone.value = ""
+                        }
                     }
-                }.addOnFailureListener {
-                    _userName.value = ""
-                    _userPhone.value = ""
-                }
+                    .addOnFailureListener { e ->
+                        Log.e("Firestore", "Error reading document from cache", e)
+                        _userName.value = ""
+                        _userPhone.value = ""
+                    }
             } else {
                 _entranceFlag.value = false
             }
