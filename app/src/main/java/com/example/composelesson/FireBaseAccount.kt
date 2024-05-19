@@ -1,18 +1,14 @@
 package com.example.composelesson
 
 import android.content.Context
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 import com.example.composelesson.AccountScreen.Card
-import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.firestoreSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.firestoreSettings
 
 
 interface UserRepository {
@@ -29,11 +25,11 @@ interface UserRepository {
 
 class FireBaseAccount : UserRepository {
     private val _auth: FirebaseAuth = FirebaseAuth.getInstance()
-    val auth = _auth
+    var auth = _auth
     private val _firestore = Firebase.firestore.apply {
         firestoreSettings = firestoreSettings{ isPersistenceEnabled = true }
     }
-    val firestore = _firestore
+    var firestore = _firestore
 
     override suspend fun registerUser(email: String, password: String, name: String, phone: String): Result<String?> =
         withContext(Dispatchers.IO) {

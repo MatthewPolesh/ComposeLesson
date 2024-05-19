@@ -18,7 +18,7 @@ fun ProgressIndicator() {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.element_background)),
+            .background(color = colorResource(id = R.color.background)),
     ) {
         CircularProgressIndicator(
             color = colorResource(id = R.color.yellow),

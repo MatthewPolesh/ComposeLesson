@@ -86,13 +86,11 @@ class MainViewModel : ViewModel() {
                             _userPhone.value = document.getString("phone").toString()
                             loadCards()
                         } else {
-                            Log.e("Firestore", "Document does not exist or is null")
                             _userName.value = ""
                             _userPhone.value = ""
                         }
                     }
                     .addOnFailureListener { e ->
-                        Log.e("Firestore", "Error reading document from cache", e)
                         _userName.value = ""
                         _userPhone.value = ""
                     }
