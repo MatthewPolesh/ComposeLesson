@@ -2,6 +2,7 @@ package com.example.composelesson.ShoppingScreen
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,11 +34,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -68,6 +69,7 @@ fun ShoppingList(
     val showPicker = remember { mutableStateOf(false) }
     val state = rememberScrollState()
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     val hourState = viewModel.selectedHour.collectAsState()
     val minuteState = viewModel.selectedMinute.collectAsState()
@@ -347,7 +349,13 @@ fun ShoppingList(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(id = R.color.yellow)
                 ),
-                onClick = {viewModel.createOrder()},
+                onClick = {
+                    when{
+                        viewModel.selectedAdress.value.adress.isEmpty() ||
+                                viewModel.selectedAdress.value.flat.isEmpty() ||
+                                viewModel.selectedAdress.value.house.isEmpty() -> Toast.makeText(context,"Пожалайста, введите адрес доставки", Toast.LENGTH_SHORT).show()
+                        else -> viewModel.createOrder()
+                    }},
                 content = {
                     Box(
                         contentAlignment = Alignment.Center

@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +28,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.MainViewModel
@@ -71,6 +74,7 @@ fun AccountRegistration(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
@@ -96,6 +100,7 @@ fun AccountRegistration(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
@@ -121,6 +126,7 @@ fun AccountRegistration(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
@@ -146,6 +152,7 @@ fun AccountRegistration(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),

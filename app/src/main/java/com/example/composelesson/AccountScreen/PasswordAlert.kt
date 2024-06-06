@@ -96,15 +96,18 @@ fun PasswordAlert(
                     when{
                         Mail.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите адрес электронной почты", Toast.LENGTH_SHORT).show()
                         !emailRegex.matches(Mail) -> Toast.makeText(context,"Неверный адрес электронной почты",Toast.LENGTH_SHORT).show()
+                        else ->{
+                            showAlert.value = !showAlert.value
+                            viewModel.resetUserPassword(Mail, context){
+                                    success, message ->
+                                if (success)
+                                    Toast.makeText(context, "Вам отправили письмо для смены пароля", Toast.LENGTH_SHORT).show()
+                                else
+                                    Toast.makeText(context, "Ошибка смены пароля", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
-                    showAlert.value = !showAlert.value
-                    viewModel.resetUserPassword(Mail, context){
-                        success, message ->
-                        if (success)
-                            Toast.makeText(context, "Вам отправили письмо для смены пароля", Toast.LENGTH_SHORT).show()
-                        else
-                            Toast.makeText(context, "Ошибка смены пароля", Toast.LENGTH_SHORT).show()
-                    }
+
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )

@@ -1,6 +1,7 @@
 package com.example.composelesson.AccountScreen
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -55,7 +56,7 @@ fun BottomAdressAlert(
     var newAdress by remember { mutableStateOf(adress.value.adress) }
     var newHouse by remember { mutableStateOf(adress.value.house) }
     var newFlat by remember { mutableStateOf(adress.value.flat) }
-    val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
 
     ModalBottomSheet(
         containerColor = colorResource(id = R.color.element_background),
@@ -162,8 +163,15 @@ fun BottomAdressAlert(
                     .padding(vertical = 20.dp),
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
-                    showDialog.value = !showDialog.value
-                    viewModel.changeAdress(newAdress,newHouse,newFlat)
+                    when{
+                        newAdress.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите название улицы", Toast.LENGTH_SHORT).show()
+                        newHouse.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите номер дома", Toast.LENGTH_SHORT).show()
+                        newFlat.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите номер квартиры", Toast.LENGTH_SHORT).show()
+                        else -> {
+                            showDialog.value = !showDialog.value
+                            viewModel.changeAdress(newAdress,newHouse,newFlat)
+                        }
+                    }
                 },
                 content = {
                     Box(

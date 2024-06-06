@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composelesson.MainViewModel
@@ -79,6 +82,7 @@ fun BottomCardAlert(
                     containerColor = colorResource(id = R.color.element_background),
                     cursorColor = colorResource(id = R.color.yellow)
                 ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                 shape = RoundedCornerShape(15.dp),
                 textStyle = TextStyle(
                     color = colorResource(id = R.color.white),
@@ -106,6 +110,7 @@ fun BottomCardAlert(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
@@ -133,6 +138,7 @@ fun BottomCardAlert(
                         containerColor = colorResource(id = R.color.element_background),
                         cursorColor = colorResource(id = R.color.yellow)
                     ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, capitalization = KeyboardCapitalization.Sentences),
                     shape = RoundedCornerShape(15.dp),
                     textStyle = TextStyle(
                         color = colorResource(id = R.color.white),
