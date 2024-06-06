@@ -1,6 +1,7 @@
 package com.example.composelesson.AccountScreen
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +52,7 @@ fun BottomCardAlert(
     var newName by remember { mutableStateOf("") }
     var newCVC by remember { mutableStateOf("") }
     var newDate by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     ModalBottomSheet(
         containerColor = colorResource(id = R.color.element_background),
@@ -154,8 +157,21 @@ fun BottomCardAlert(
                     .padding(vertical = 20.dp),
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
-                    showDialog.value = !showDialog.value
-                    viewModel.addUserCard(newName,newCVC,newDate)
+                    val nameRegex = "^\\d{4}\\d{4}\\d{4}\\d{4}$".toRegex()
+                    val cvcRegex = "^\\d{3}$".toRegex()
+                    val dateRegex = "^\\d{4}$".toRegex()
+                    when{
+                        newName.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите номер карты", Toast.LENGTH_SHORT).show()
+                        newCVC.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите CVV/CVC-код", Toast.LENGTH_SHORT).show()
+                        newDate.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите дату актуальности карты", Toast.LENGTH_SHORT).show()
+                        newDate.length < 4 || !dateRegex.matches(newDate)-> Toast.makeText(context, "Неверно введена дата", Toast.LENGTH_SHORT).show()
+                        newCVC.length < 3 || !cvcRegex.matches(newCVC) -> Toast.makeText(context, "Неверно введен CVV/CVC-код", Toast.LENGTH_SHORT).show()
+                        newName.length < 16 || !nameRegex.matches(newName)-> Toast.makeText(context, "Неверно введен номер карты", Toast.LENGTH_SHORT).show()
+                        else ->{
+                            showDialog.value = !showDialog.value
+                            viewModel.addUserCard(newName,newCVC,newDate)
+                        }
+                    }
                           },
                 content = {
                     Box(

@@ -1,6 +1,7 @@
 package com.example.composelesson.AccountScreen
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -44,6 +46,7 @@ fun AccountAlert(
 ) {
     var newName by remember { mutableStateOf(viewModel.userName.value)}
     var newPhoneNumber by remember { mutableStateOf(viewModel.userPhone.value)}
+    val context = LocalContext.current
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
         title = { Text(
@@ -109,8 +112,22 @@ fun AccountAlert(
                 tint = colorResource(id = R.color.element_background),
                 modifier = Modifier.size(18.dp)
             )},
-            onClick = { showAlert.value = !showAlert.value
-                        viewModel.changeUserInfo(newName,newPhoneNumber)
+            onClick = {
+                val phoneRegex = "^\\d{3}\\d{3}\\d{2}\\d{2}$".toRegex()
+                when{
+                    newName.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите имя",Toast.LENGTH_SHORT).show()
+                    newPhoneNumber.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите номер телефона",Toast.LENGTH_SHORT).show()
+                    !phoneRegex.matches(newPhoneNumber) -> Toast.makeText(context,"Неверный номер телефона",Toast.LENGTH_SHORT).show()
+                    else -> {
+                        showAlert.value = !showAlert.value
+                        viewModel.updateUserProfile(newName,newPhoneNumber){
+                                success, message ->
+                            if (!success) Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                }
+
                       },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )},

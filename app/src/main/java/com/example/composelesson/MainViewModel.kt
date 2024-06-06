@@ -3,8 +3,6 @@ package com.example.composelesson
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import android.text.BoringLayout
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,9 +10,7 @@ import com.example.composelesson.AccountScreen.Card
 import com.example.composelesson.MenuScreen.Adress
 import com.example.composelesson.MenuScreen.FoodType
 import com.example.composelesson.MenuScreen.Meel
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.Source
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,8 +24,6 @@ class MainViewModel : ViewModel() {
     //Database
 
     private val repository: FireBaseAccount = FireBaseAccount()
-
-    private val userID = repository.auth.currentUser?.uid
 
     private var mapCards: List<Pair<String, Card?>> = emptyList()
 
@@ -68,10 +62,7 @@ class MainViewModel : ViewModel() {
     //AccountMenu--fun
 
 
-    fun changeUserInfo(userName: String, userPhone: String) {
-        _userName.value = userName
-        _userPhone.value = userPhone
-    }
+
 
     private fun checkAuthState() {
         repository.auth.addAuthStateListener { auth ->
@@ -114,19 +105,19 @@ class MainViewModel : ViewModel() {
                         _userName.value = document.getString("name").toString()
                         _userPhone.value = document.getString("phone").toString()
                         loadCards()
-
                     }
                 }
-            } else _entranceFlag.value = false
+            } else {
+                _entranceFlag.value = false
+            }
         }
     }
 
-    fun registerUser(email: String, password: String, name: String, phone: String) {
+    fun registerUser(email: String, password: String, name: String, phone: String, callback: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             val registrationResult = repository.registerUser(email, password, name, phone)
             if (registrationResult.isSuccess) {
                 val uid = registrationResult.getOrNull()
-
                 if (uid != null) {
                     val userInfo = mapOf(
                         "name" to name, "email" to email, "phone" to phone
@@ -137,15 +128,19 @@ class MainViewModel : ViewModel() {
                         _isLoading.value = true
                         _userName.value = name
                         _userPhone.value = phone
+                        callback(true, null)
                         loadCards()
                     } else {
                         _registrationError.value = firestoreResult.exceptionOrNull()?.message
+                        callback(false, "Ошибка при сохранении данных в облако.")
                     }
                 } else {
                     _registrationError.value = "UID is null"
+                    callback(false, "Ошибка. Пользователь не найден.")
                 }
             } else {
                 _registrationError.value = registrationResult.exceptionOrNull()?.message
+                callback(false, "Ошибка. Проверьте электронную почту и пароль.")
             }
         }
     }
@@ -158,16 +153,36 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun updateUserProfile( name: String, phone: String, callback: (Boolean, String?) -> Unit)
+    {
+        val userID = repository.auth.currentUser?.uid
+        viewModelScope.launch {
+            repository.updateUserProfile(userID,name,phone)
+            {success ->
+                if (success) {
+                    _userName.value = name
+                    _userPhone.value = phone
+                    callback(true, "Данные успешно изменены")
+                }
+                else
+                    callback(false, "Не удалось изменить данные")
+            }
+        }
+    }
+
     fun Exit() {
         viewModelScope.launch { repository.singOut() }
         _userName.value = ""
         _userPhone.value = ""
         _entranceFlag.value = false
         _registrationFlag.value = false
-        Log.d("MyLog", "${_entranceFlag.value}, ${_registrationFlag.value}")
+        val tempArr = mutableListOf<Card>()
+        _cards.value = tempArr
+        clearList()
     }
 
     fun addUserCard(cardNumber: String, year: String, cvc: String) {
+        val userID = repository.auth.currentUser?.uid
         val card = Card(cardNumber, year, cvc)
         viewModelScope.launch {
             repository.addBankCard(userID, card) {
@@ -177,6 +192,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun deleteBankCard(card: Card) {
+        val userID = repository.auth.currentUser?.uid
         val cardId = mapCards.firstOrNull{it.second == card}?.first
         viewModelScope.launch {
             if (cardId != null) {
@@ -191,6 +207,7 @@ class MainViewModel : ViewModel() {
 
     fun loadCards(){
         viewModelScope.launch {
+            val userID = repository.auth.currentUser?.uid
             repository.getBankCards(userID){
                 cards ->
                 val tempArr = mutableListOf<Card>()

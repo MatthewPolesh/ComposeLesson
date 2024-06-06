@@ -3,10 +3,7 @@ package com.example.composelesson.AccountScreen
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -96,6 +92,11 @@ fun PasswordAlert(
                     )
                 },
                 onClick = {
+                    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex()
+                    when{
+                        Mail.isEmpty() -> Toast.makeText(context, "Пожалуйста, введите адрес электронной почты", Toast.LENGTH_SHORT).show()
+                        !emailRegex.matches(Mail) -> Toast.makeText(context,"Неверный адрес электронной почты",Toast.LENGTH_SHORT).show()
+                    }
                     showAlert.value = !showAlert.value
                     viewModel.resetUserPassword(Mail, context){
                         success, message ->

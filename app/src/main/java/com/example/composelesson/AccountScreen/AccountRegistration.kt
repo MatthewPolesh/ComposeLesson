@@ -1,6 +1,8 @@
 package com.example.composelesson.AccountScreen
 
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -46,6 +49,9 @@ fun AccountRegistration(
     var newPhoneNumber by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var newMail by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+
     AlertDialog(
         containerColor = colorResource(id = R.color.element_background),
         title = {
@@ -72,7 +78,7 @@ fun AccountRegistration(
                         fontSize = 15.sp
 
                     ),
-                    onValueChange = { if (it.length <= 23) newName = it },
+                    onValueChange = { if (it.length <= 23) newName = it},
                     label = {
                         Text(
                             text = "Имя",
@@ -169,9 +175,25 @@ fun AccountRegistration(
                     )
                 },
                 onClick = {
+                    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex()
+                    val phoneRegex = "^\\d{3}\\d{3}\\d{2}\\d{2}$".toRegex()
+                    Log.d("MylOg", newPhoneNumber)
+                    when{
+                        newName.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите имя",Toast.LENGTH_SHORT).show()
+                        newMail.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите адрес электронной почты",Toast.LENGTH_SHORT).show()
+                        newPhoneNumber.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите номер телефона",Toast.LENGTH_SHORT).show()
+                        newPassword.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите пароль",Toast.LENGTH_SHORT).show()
+                        !phoneRegex.matches(newPhoneNumber) -> Toast.makeText(context,"Неверный номер телефона",Toast.LENGTH_SHORT).show()
+                        newPassword.length < 6 -> Toast.makeText(context,"Пароль слишком короткий",Toast.LENGTH_SHORT).show()
+                        !emailRegex.matches(newMail) -> Toast.makeText(context,"Неверный адрес электронной почты",Toast.LENGTH_SHORT).show()
+                        else -> {
+                            showAlert.value = !showAlert.value
+                            viewModel.registerUser(newMail.trim(),newPassword.trim(), newName.trim(), newPhoneNumber.trim()) { success, message ->
+                                if (!success) Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
 
-                    showAlert.value = !showAlert.value
-                    viewModel.registerUser(newMail,newPassword, newName, newPhoneNumber)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
             )

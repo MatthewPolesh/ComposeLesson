@@ -20,6 +20,7 @@ interface UserRepository {
     suspend fun addBankCard(userId: String?, card: Card, callback: (Boolean) -> Unit)
     suspend fun deleteBankCard(userId: String?, cardId: String, callback: (Boolean) -> Unit)
     suspend fun getBankCards(userId: String?, callback: (List<Pair<String, Card?>>) -> Unit)
+    suspend fun updateUserProfile(userId: String?, name: String, phone: String, callback: (Boolean) -> Unit)
 }
 
 
@@ -82,11 +83,9 @@ class FireBaseAccount : UserRepository {
                 .collection("cards")
                 .add(card)
                 .addOnSuccessListener { documentReference ->
-                    // Bank card successfully added
                     callback(true)
                 }
                 .addOnFailureListener { e ->
-                    // Error adding bank card
                     callback(false)
                 }
         }
@@ -107,6 +106,26 @@ class FireBaseAccount : UserRepository {
                 }
         }
     }
+
+    override suspend fun updateUserProfile(userId: String?, name: String, phone: String, callback: (Boolean) -> Unit) {
+        if (userId != null) {
+            val userRef = firestore.collection("users").document(userId)
+            val updates = hashMapOf<String, Any>(
+                "name" to name,
+                "phone" to phone
+            )
+            userRef.update(updates)
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener { e ->
+                    callback(false)
+                }
+        } else {
+            callback(false)
+        }
+    }
+
 
     override suspend fun getBankCards(
         userId: String?,

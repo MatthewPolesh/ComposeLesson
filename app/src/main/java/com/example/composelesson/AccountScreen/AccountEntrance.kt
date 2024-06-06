@@ -156,11 +156,20 @@ fun AccountEntrance(
                         )
                     },
                     onClick = {
+                        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex()
+                        when{
 
-                            showAlert.value = !showAlert.value
-                            viewModel.viewModelScope.launch {
-                                viewModel.signInUser(newMail, newPassword)
+                            newMail.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите адрес электронной почты", Toast.LENGTH_SHORT).show()
+                            newPassword.isEmpty() -> Toast.makeText(context,"Пожалуйста, введите пароль", Toast.LENGTH_SHORT).show()
+                            newPassword.length < 6 -> Toast.makeText(context,"Неверный пароль", Toast.LENGTH_SHORT).show()
+                            !emailRegex.matches(newMail) -> Toast.makeText(context,"Неверный адрес электронной почты", Toast.LENGTH_SHORT).show()
+                            else -> {
+                                showAlert.value = !showAlert.value
+                                viewModel.viewModelScope.launch {
+                                    viewModel.signInUser(newMail.trim(), newPassword.trim())
+                                }
                             }
+                        }
 
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.yellow))
