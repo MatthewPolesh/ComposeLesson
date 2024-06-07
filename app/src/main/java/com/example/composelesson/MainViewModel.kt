@@ -115,6 +115,7 @@ class MainViewModel : ViewModel() {
 
     fun registerUser(email: String, password: String, name: String, phone: String, callback: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
+            _isLoading.value = true
             val registrationResult = repository.registerUser(email, password, name, phone)
             if (registrationResult.isSuccess) {
                 val uid = registrationResult.getOrNull()
